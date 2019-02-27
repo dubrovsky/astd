@@ -1,0 +1,104 @@
+{
+    "name": "astd",
+    "settings": {
+        "cmd": {
+            "license": "commercial",
+            "cmdVersion": "6.6.0.13",
+            "frameworkOverride": "D:\\WORK\\LIBS\\extjs-6.x\\ext-6.6.0"
+        },
+        "urlPrefixTemplate": "http://localhost:{port}/{path}",
+        "urlPrefix": "http://localhost:2803/",
+        "canvasControls": {
+            "viewportSize": {
+                "name": "Auto Expand",
+                "builtIn": true,
+                "height": null,
+                "width": null
+            }
+        },
+        "exportPath": "",
+        "buildShouldOverwriteIndex": false,
+        "generateArchitectVersion": true,
+        "spacesToIndent": 4,
+        "lineEnding": "CRLF",
+        "genTimestamps": false,
+        "cacheBust": false,
+        "installStatus": "Not Installed",
+        "sdkPath": "",
+        "lastBuildSelection": {
+            "value": "webBuild",
+            "display": "Build web app",
+            "buildPlatform": false
+        }
+    },
+    "xdsVersion": "4.2.4",
+    "xdsBuild": 389,
+    "schemaVersion": 1,
+    "upgradeVersion": 310000000001,
+    "framework": "ext66",
+    "viewOrderMap": {
+        "view": [
+            "45c3fad4-0244-4cd8-885f-c61eb3cbccd4",
+            "0875fcf8-b667-493b-8972-8e9db31fef27",
+            "38084347-4d28-4e2f-b870-8b6d192d51fd",
+            "ee254896-c6af-4fcc-a52a-a2a08d064f94",
+            "b81b82ed-3c57-4d16-a463-0cf2d86d84c1",
+            "e9188eef-058c-40e4-aee7-c5ce4520682a",
+            "97aa6e64-1121-425d-a015-0cf8a4ab3254",
+            "e5c39f50-122f-44fd-b4a7-0fa7275ec531",
+            "cdc35fe8-297d-47e2-a658-07547820cb27",
+            "6e23e916-2e3a-43d8-9da2-cbb007b51db7",
+            "58402063-e476-408a-858b-2def730af83b",
+            "fc73879c-b047-415d-b346-33a43c358edd",
+            "6cde1b09-6af2-4316-a301-f6ce59ded20e",
+            "6621a95f-d28e-4350-bd49-3324984a38fc",
+            "caab4d49-d48c-495d-a04f-e496f9ffd173",
+            "afb5023e-135b-4cee-b508-ba887c9de3d7",
+            "222ca5c7-0979-4ada-9397-cb8322da2b97",
+            "a5e3c39a-6a97-424a-8ed8-fd74639fcb32",
+            "5d4c369f-9ece-4b68-bdc1-13f807e3e8cd",
+            "a1b0e39a-5dc4-4496-9a0d-f0756fb45e51",
+            "559cc087-6cf9-4614-a8e0-d4424a183323",
+            "55fdcb82-7acf-41b3-a125-32e48850ef09",
+            "80ce13e3-1b44-4317-a3a0-d20933700b2e",
+            "4b445934-3163-439b-a2ed-7f295363a8c2",
+            "9a50fbf4-de18-45c2-8d06-0b3eb68d8256",
+            "86974a56-9542-4519-b9ec-6cd630461a4a",
+            "0c503bda-0a99-4520-896e-e5b96bb40516",
+            "b4a0c58e-bff6-44cc-8ce1-fbe67772e7f8",
+            "6354cdb4-1e27-480f-af83-c139e482118c",
+            "dfe7c45a-9ae6-4bd5-9b16-bac623e43a7b",
+            "da5fe7ad-c0e2-4003-a7ca-3e65c1c18f45",
+            "36072112-85c3-4361-b4ec-ff3722d2293b",
+            "51efc34a-d16c-4f0f-b11f-6aa972e81e2d",
+            "3a820f9e-0a53-4589-a801-a0ffaebb505a",
+            "cdc575da-d41c-4dd9-8acf-96984cee247c",
+            "97827c14-df3f-45b1-b271-760d906f7b88"
+        ],
+        "store": [],
+        "controller": [],
+        "model": [
+            "3dacd1b4-ba82-47a5-95f6-f0857747b3ff",
+            "dd5e07c6-ce83-4957-a1b4-6ca42e40de72",
+            "08b527f2-7502-433b-9687-9c0e23b84ce5",
+            "f0a90ffc-3480-4ae3-95a1-7ff0254d0af6",
+            "31852eef-5054-4876-95b4-e304f8134968",
+            "b7077c06-0620-497c-8706-1c0b7b26bf3e",
+            "ebc33494-0571-4dfc-9572-8bf10d9c32f1",
+            "a903c808-34cc-4f05-80b8-dd19559f092c",
+            "596bbcbf-f60c-43f5-9878-7fbf2e98493b"
+        ],
+        "resource": [
+            "7a736db2-6889-429f-bf65-2d0a6fe5c6c5",
+            "e609d0df-3fd9-40d8-9f9d-4a880e00b6fc",
+            "b45fc1a8-393e-4c2a-8c38-2f1cd8a1cf0b",
+            "cb529f2e-f15b-4ae0-873b-214dd0647344",
+            "be50bb2b-1a2c-4b0a-b398-fd7f3b08461f",
+            "f925caf3-7262-413a-bd1f-7f4d13bb79fa",
+            "bc881909-57b7-46f6-b350-d3f6c92a64db"
+        ],
+        "app": [
+            "application"
+        ]
+    }
+}

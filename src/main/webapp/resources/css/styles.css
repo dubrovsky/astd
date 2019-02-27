@@ -1,0 +1,173 @@
+/* Application Loading Spinner  */
+.loader {
+    margin: 60px auto;
+    margin-top: 25%;
+    font-size: 10px;
+    position: relative;
+    text-indent: -9999em;
+    border-top: 1.1em solid rgba(0,128,255, 0.2);
+    border-right: 1.1em solid rgba(0,128,255, 0.2);
+    border-bottom: 1.1em solid rgba(0,128,255, 0.2);
+    border-left: 1.1em solid #0080ff;
+    -webkit-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-animation: load8 1.1s infinite linear;
+    animation: load8 1.1s infinite linear;
+}
+.loader,
+.loader:after {
+    border-radius: 50%;
+    width: 10em;
+    height: 10em;
+}
+@-webkit-keyframes load8 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+@keyframes load8 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+h1 {
+    text-align: left;
+    color: #006ba8;
+    font-size: 40px;
+    line-height: 40px;
+    font-family: serif, caption, "Times New Roman";
+}
+
+h3 {
+    text-align: left;
+    color: #404040;
+    font-size: 14px;
+    line-height: 14px;
+    font-family: aleksandracregular, Helvetica, Tahoma;
+}
+
+h3>label {
+    font-size: 12px;
+    color: #747474;
+}
+
+#app-header-user {
+    float: right;
+    clear: right;
+}
+#app-header-user h3 {
+    margin: 4px;
+    white-space: nowrap;
+}
+
+/*#app-header-branch-type {
+    margin: 0px 4px 4px 4px;
+    float: right;
+    clear: right;
+}*/
+#app-header-branch-type label {
+    white-space: nowrap;
+    color: #005b8f;
+    font-size: 17px;
+    line-height: 17px;
+    font-family: arial, sans-serif;
+}
+/*#app-header-branch-type td {
+    padding-left: 30px;
+}*/
+#app-header-branch-type .x-form-item label, #app-header-branch-type .x-form-item input {
+    cursor: pointer;
+}
+
+/*#app-header-text h1 {
+    padding-left: 120px;
+    margin: 16px 0px 14px 0px;
+    white-space: nowrap;
+}*/
+
+.detailForm01 div div div div div label {
+    font-size: 14px;
+    font-family: arial, sans-serif;
+}
+.detailForm01 div div div div div .x-form-display-field-default  {
+    font-size: 14px;
+    font-family: Georgia, serif;
+    color: #005b8f;
+}
+.detailForm01 div div div div div.rejected01 .x-form-display-field-default {
+    color: #f12222;
+}
+.labelField01 {
+    float: left;
+    margin: -8px 0px 0px 0px;
+}
+.detailForm01 .labelField01 label {
+    font-size: 13px;
+    color: #676767;
+}
+.detailForm01 .labelField01 .x-form-display-field-default {
+    font-size: 13px;
+}
+.detailForm01 .x-panel-body {
+    overflow-y: auto;
+}
+.detailForm01 .embed01 {
+  width: 90%;
+  margin: 10px 5%;
+  clear: both;
+  display: inline-block;
+}
+
+.status-signing {
+    background: #feffc1;
+    border: 1px solid #e9d710;
+}
+
+.status-default {
+  background: #feffc1;
+  border: 1px solid #e9d710;
+}
+
+.status-rejected {
+  background: #f3d3d3;
+  border: 1px solid #f12222;
+}
+
+.status-invalid {
+  background: #f3d3d3;
+  border: 1px solid #f12222;
+}
+
+.my-next-sign {
+    border: 1px solid green;
+    background-color: lightgreen;
+}
+
+.pdfobject-container {
+    height: 600px;
+}
+.my-title .x-title-text {
+    white-space: normal;
+}
+.my-title .x-title-text span {
+    display: inline-block;
+}
+.my-title .x-title-icon-wrap {
+    vertical-align: top;
+}
+.glyph_01 {
+    font: 23px/0.8 FontAwesome;
+    color: #005b8f;
+}

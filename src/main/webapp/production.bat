@@ -1,0 +1,1 @@
+java -jar "C:\Program Files\Sencha\Cmd\6.6.0.13\sencha.jar" app build production
