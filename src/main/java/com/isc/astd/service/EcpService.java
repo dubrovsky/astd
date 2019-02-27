@@ -1,0 +1,124 @@
+package com.isc.astd.service;
+
+import by.avest.crypto.pkcs.pkcs7.PKCS7;
+import com.isc.astd.config.ApplicationProperties;
+import com.isc.astd.domain.*;
+import com.isc.astd.repository.FilePositionRepository;
+import com.isc.astd.repository.FileRepository;
+import com.isc.astd.service.dto.HashDTO;
+import com.isc.astd.service.util.AvDirPKIXBuilderParameters;
+import com.isc.astd.service.util.EcpUtils;
+import com.isc.astd.service.util.Pkcs7VerifyAv;
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.nio.file.Paths;
+import java.security.cert.PKIXBuilderParameters;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * @author p.dzeviarylin
+ */
+@Service
+public class EcpService {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
+    private final ApplicationProperties properties;
+
+    private final FileSystemService fileSystemService;
+
+    private final FilePositionRepository filePositionRepository;
+
+    private final FileRepository fileRepository;
+    
+    private final PKIXBuilderParameters pkixBuilderParameters;
+
+    public EcpService(ApplicationProperties properties, FileSystemService fileSystemService, FilePositionRepository filePositionRepository, FileRepository fileRepository) throws Exception {
+        this.properties = properties;
+        pkixBuilderParameters = new AvDirPKIXBuilderParameters(Paths.get(properties.getStoragePath()).toString()).get();
+        this.fileSystemService = fileSystemService;
+        this.filePositionRepository = filePositionRepository;
+        this.fileRepository = fileRepository;
+    }
+
+    boolean isEcpValid(byte[] ecp, byte[] hash) throws Exception {
+        PKCS7 pkcs72 = new PKCS7(ecp);
+        Pkcs7VerifyAv pkcs7VerifyAv = new Pkcs7VerifyAv(pkixBuilderParameters, pkcs72, hash);
+        boolean ret = pkcs7VerifyAv.verify();
+        log.debug(pkcs7VerifyAv.toString());
+        return ret;
+    }
+
+    public String getHash(byte[] file) throws Exception {
+        return EcpUtils.getHash(file, properties.getEcpAlgorithm());
+    }
+
+    boolean isHashValid(byte[] dbHash, byte[] realHash) {
+        return Arrays.equals(dbHash, realHash);
+    }
+
+    List<HashDTO> getDbHash(Doc doc) {
+        List<HashDTO> hashs = new ArrayList<>(doc.getFiles().size());
+        List<File> toSort = sortFiles(doc);
+        for (File file : toSort) {
+            hashs.add(new HashDTO(file.getId(), file.getHash()));
+        }
+        return hashs;
+    }
+
+    List<HashDTO> getRealHash(Doc doc) throws Exception {
+        List<HashDTO> hashs = new ArrayList<>(doc.getFiles().size());
+        List<File> toSort = sortFiles(doc);
+        for (File file : toSort) {
+            byte[] bytes = fileSystemService.readFile(file, doc);
+            hashs.add(new HashDTO(file.getId(), getHash(bytes)));
+        }
+        return hashs;
+    }
+
+    HashDTO getRealHash(Doc doc, File file) throws Exception {
+        byte[] bytes = fileSystemService.readFile(file, doc);
+        return new HashDTO(file.getId(), getHash(bytes));
+    }
+
+    private List<File> sortFiles(Doc doc) {
+        List<File> toSort = new ArrayList<>(doc.getFiles());
+        toSort.sort(Comparator.comparing(AbstractBaseEntity::getId));
+        return toSort;
+    }
+
+    byte[] decodeEcp(String ecp) {
+        byte[] data;
+        if(Base64.isBase64(ecp)){
+            data = Base64.decodeBase64(ecp);
+        } else {
+            data = ecp.getBytes();
+        }
+        return data;
+    }
+
+    boolean isRouterEcpsValid(byte[] hash, File file, User user) throws Exception {
+        boolean result = true;
+        final List<FilePosition> filePositions = file.getFilePositions().stream().filter(filePosition -> filePosition.getEcp() != null).collect(Collectors.toList());
+        for(FilePosition filePosition: filePositions){
+            if(!isEcpValid(filePosition.getEcp(), hash)){
+                filePosition.setInvalid(true);
+                filePositionRepository.save(filePosition);
+            }
+        }
+        if(filePositions.stream().anyMatch(FilePosition::isInvalid)){
+            file.setStatus(File.Status.INVALID);
+            file.setStatusModifiedBy(user.getId());
+            fileRepository.save(file);
+            result = false;
+        }
+        return result;
+    }
+}
