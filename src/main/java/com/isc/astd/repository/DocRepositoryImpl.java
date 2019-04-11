@@ -40,18 +40,18 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
                 "  Doc d\n" +
                 "  JOIN d.files f\n" +
                 "WHERE f.nextSignPosition.id = :nextSignPositionId AND f.status IN ('default', 'signing') \n" +
-                "  AND NOT EXISTS\n" +
+                /*"  AND NOT EXISTS\n" +
                 "  (SELECT\n" +
                 "    fp.id.file.id\n" +
                 "  FROM\n" +
                 "    FilePosition fp\n" +
-                "  WHERE fp.id.file.id = f.id AND fp.createdBy = :userId)\n" +
+                "  WHERE fp.id.file.id = f.id AND fp.createdBy = :userId)\n" +*/
                 (rootCatalogId != null ? " AND d.rootCatalog.id = :rootCatalogId\n" : "")
 //              +  "  GROUP BY d.id",
                 , Tuple.class
         );
         query.setParameter("nextSignPositionId", nextSignPositionId);
-        query.setParameter("userId", userId);
+//        query.setParameter("userId", userId);
         if(rootCatalogId != null){
             query.setParameter("rootCatalogId", rootCatalogId);
         }

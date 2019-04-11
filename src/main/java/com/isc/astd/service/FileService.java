@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -105,11 +106,14 @@ public class FileService {
 		SignedPositionDTO nextSignPosition = fileEcpService.getNextSignPosition(file);
 		boolean canBeSigned = fileEcpService.isCanBeSigned(myPosition, file);
 		boolean isNotSignedYet = fileEcpService.isNotSignedYet(user, myPosition, file, canBeSigned);
-		boolean isMyOrderToSign = fileEcpService.isMyOrderToSign(myPosition, isNotSignedYet, nextSignPosition);
+		boolean isMyOrderToSign = fileEcpService.isMyOrderToSign(myPosition, isNotSignedYet, nextSignPosition/*, file*/);
+		boolean isMyOrderToSignAfterUpdate = fileEcpService.isMyOrderToSign(myPosition, isNotSignedYet, nextSignPosition, file);
 
 		fileDTO.setCanBeSigned(canBeSigned);
 		fileDTO.setNotSignedYet(isNotSignedYet);
 		fileDTO.setMyOrderToSign(isMyOrderToSign);
+		fileDTO.setMyOrderToSignAfterUpdate(isMyOrderToSignAfterUpdate);
+		fileDTO.setOriginalCheckedSigned(fileEcpService.isOriginalCheckedSigned(myPosition, file));
 		fileDTO.setRoutePositionStatus(
 				nextSignPosition != null ?
 						file.getRoute().getRoutePositions().stream().
@@ -145,7 +149,7 @@ public class FileService {
 			file = fileRepository.save(file);
 			fileSystemService.writeFile(dto.getFile(), doc, file.getId());
 
-			if(prevFile.getStatus() == File.Status.REJECTED){
+			if (prevFile.getStatus() == File.Status.REJECTED) {
 				prevFile.setBranchType(File.BranchType.ARCHIVE);  // to hide prev file in grid
 			}
 			prevFile.setParentFile(file);
@@ -221,15 +225,16 @@ public class FileService {
 		File file = getFile(id);
 		Position myPosition = userService.getUser(user.getUsername()).getPosition();
 		if (file.getParentFile() == null) {
-			if (myPosition.getId() == 5 && file.getStatus() == File.Status.REJECTED ||
-					myPosition.getId() == 9 &&
+			if ((myPosition.getId() == 5 && file.getStatus() == File.Status.REJECTED) ||
+					(myPosition.getId() == 9 &&
 							(file.getStatus() == File.Status.DEFAULT ||
-									file.getStatus() == File.Status.SIGNING && fileEcpService.getSignedNum(file) <= 2)
+									file.getStatus() == File.Status.SIGNING && fileEcpService.getSignedNum(file) <= 2)) ||
+					(myPosition.getId() == 5 && file.getRoute().getPosition().getId() == 5 && file.getStatus() == File.Status.DEFAULT)
 			) {
 				File prevVersion = file.getChildFile();
 				if (prevVersion != null) {
 					prevVersion.setParentFile(null);
-					if(prevVersion.getStatus() == File.Status.REJECTED){
+					if (prevVersion.getStatus() == File.Status.REJECTED) {
 						prevVersion.setBranchType(File.BranchType.DEFAULT); // make file visible in grid
 					}
 					fileRepository.save(prevVersion);
@@ -415,9 +420,9 @@ public class FileService {
 	}
 
 	private void updatePrevSystemFilesVersion(File file, List<File> prevFilesVersion) throws IOException {
-		if(!prevFilesVersion.isEmpty()){
-			for(File prevFileVersion: prevFilesVersion){
-				if(prevFileVersion.getStatus() == File.Status.REJECTED && (file.getStatus() == File.Status.APPROVED || file.getStatus() == File.Status.REFERENCE)){
+		if (!prevFilesVersion.isEmpty()) {
+			for (File prevFileVersion : prevFilesVersion) {
+				if (prevFileVersion.getStatus() == File.Status.REJECTED && (file.getStatus() == File.Status.APPROVED || file.getStatus() == File.Status.REFERENCE)) {
 					fileSystemService.deleteFile(prevFileVersion, docService.getDoc(file.getDoc().getId()));
 				}
 			}
@@ -426,16 +431,16 @@ public class FileService {
 
 	private List<File> updatePrevFileVersion(File file) {
 		List<File> prevFiles = new ArrayList<>();
-		if(file.getChildFile() != null){
+		if (file.getChildFile() != null) {
 			File prevFileVersion = file.getChildFile();
-			if(prevFileVersion.getStatus() == File.Status.REJECTED){
-				while (prevFileVersion != null && prevFileVersion.getStatus() == File.Status.REJECTED){
+			if (prevFileVersion.getStatus() == File.Status.REJECTED) {
+				while (prevFileVersion != null && prevFileVersion.getStatus() == File.Status.REJECTED) {
 					File prevPrevFileVersion = prevFileVersion.getChildFile();
 					prevFileVersion.setParentFile(null);
 					prevFileVersion.setChildFile(null);
 					fileRepository.delete(prevFileVersion);
 					file.setChildFile(null);
-					if(prevPrevFileVersion != null) {
+					if (prevPrevFileVersion != null) {
 						prevPrevFileVersion.setParentFile(file);
 						prevPrevFileVersion.setBranchType(File.BranchType.ARCHIVE);
 						fileRepository.save(prevPrevFileVersion);
@@ -493,6 +498,16 @@ public class FileService {
 		File file = getFile(fileId);
 		PropertyAccessor propertyAccessor = PropertyAccessorFactory.forBeanPropertyAccess(file);
 		propertyAccessor.setPropertyValue(fieldName, value);
+		file.setAuditAction(Audit.Action.FILE_PAPER_COPY);
+		fileRepository.save(file);
+	}
+
+	public void saveOriginalChecked(long fileId, String fioSign1, String fioSign2, LocalDate dateSign1, LocalDate dateSign2) {
+		File file = getFile(fileId);
+		file.setFioSign1(fioSign1);
+		file.setFioSign2(fioSign2);
+		file.setDateSign1(dateSign1);
+		file.setDateSign2(dateSign2);
 		file.setAuditAction(Audit.Action.FILE_PAPER_COPY);
 		fileRepository.save(file);
 	}

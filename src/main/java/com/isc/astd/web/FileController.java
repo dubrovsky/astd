@@ -2,16 +2,30 @@ package com.isc.astd.web;
 
 import com.isc.astd.domain.File;
 import com.isc.astd.service.FileService;
-import com.isc.astd.service.dto.*;
+import com.isc.astd.service.dto.EcpDTO;
+import com.isc.astd.service.dto.EcpHashDTO;
+import com.isc.astd.service.dto.FileBaseDTO;
+import com.isc.astd.service.dto.FileDTO;
+import com.isc.astd.service.dto.FileViewDTO;
+import com.isc.astd.service.dto.PageRequestDTO;
+import com.isc.astd.service.dto.PageableDTO;
+import com.isc.astd.service.dto.RejectFileDTO;
 import com.isc.astd.web.commons.Response;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.Collections;
 
 /**
@@ -127,8 +141,16 @@ public class FileController {
     }
 
     @PostMapping("/paper/{id}")
-    public ResponseEntity<Response<EcpHashDTO>> savePaperChange(@PathVariable("id") long fileId, @RequestParam("value") boolean value, @RequestParam("field") String fieldName) {
+    public ResponseEntity<Response> savePaperChange(@PathVariable("id") long fileId, @RequestParam("value") boolean value, @RequestParam("field") String fieldName) {
         fileService.savePaperChange(fileId, value, fieldName);
         return ResponseEntity.ok(new Response<>());
     }
+
+	@PostMapping("/originalchecked/{id}")
+	public ResponseEntity<Response> saveOriginalChecked(@PathVariable("id") long fileId,
+	                                                                @RequestParam("fioSign1") String fioSign1, @RequestParam("fioSign2") String fioSign2,
+	                                                                @RequestParam("dateSign1") LocalDate dateSign1, @RequestParam("dateSign2") LocalDate dateSign2) {
+		fileService.saveOriginalChecked(fileId, fioSign1, fioSign2, dateSign1, dateSign2);
+		return ResponseEntity.ok(new Response<>());
+	}
 }

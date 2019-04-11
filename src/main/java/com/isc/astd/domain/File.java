@@ -7,11 +7,21 @@ import com.isc.astd.domain.converter.FileStatusConverter;
 import com.isc.astd.service.json.Views;
 import org.hibernate.annotations.BatchSize;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -101,6 +111,20 @@ public class File extends AbstractBaseEntity {
     @Convert(converter = BranchTypeConverter.class)
     @Column(name = "branch_type", nullable = false)
     private BranchType branchType = BranchType.DEFAULT;
+
+	@Size(max = 32)
+	@Column(name = "fio_sign_1", length = 32)
+	private String fioSign1;
+
+	@Size(max = 32)
+	@Column(name = "fio_sign_2", length = 32)
+	private String fioSign2;
+
+	@Column(name = "date_sign_1")
+	private LocalDate dateSign1;
+
+	@Column(name = "date_sign_2")
+	private LocalDate dateSign2;
 
     public String getName() {
         return name;
@@ -244,6 +268,38 @@ public class File extends AbstractBaseEntity {
     public void setNextSignPosition(Position nextSignPosition) {
         this.nextSignPosition = nextSignPosition;
     }
+
+	public String getFioSign1() {
+		return fioSign1;
+	}
+
+	public void setFioSign1(String fioSign1) {
+		this.fioSign1 = fioSign1;
+	}
+
+	public String getFioSign2() {
+		return fioSign2;
+	}
+
+	public void setFioSign2(String fioSign2) {
+		this.fioSign2 = fioSign2;
+	}
+
+	public LocalDate getDateSign1() {
+		return dateSign1;
+	}
+
+	public void setDateSign1(LocalDate dateSign1) {
+		this.dateSign1 = dateSign1;
+	}
+
+	public LocalDate getDateSign2() {
+		return dateSign2;
+	}
+
+	public void setDateSign2(LocalDate dateSign2) {
+		this.dateSign2 = dateSign2;
+	}
 
    /* public void removeFilePosition(FilePosition filePosition) {
         filePositions.remove(filePosition);

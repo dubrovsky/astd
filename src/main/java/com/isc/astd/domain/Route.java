@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,6 +26,9 @@ public class Route extends AbstractBaseEntity {
     @Size(min = 1, max = 48)
     @Column(name = "name", length = 48, nullable = false)
     private String name;
+
+	@Column(name = "expired_date")
+	private Instant expiredDate;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "position_id")
@@ -85,5 +89,13 @@ public class Route extends AbstractBaseEntity {
 
 	public void setPosition(Position position) {
 		this.position = position;
+	}
+
+	public Instant getExpiredDate() {
+		return expiredDate;
+	}
+
+	public void setExpiredDate(Instant expiredDate) {
+		this.expiredDate = expiredDate;
 	}
 }

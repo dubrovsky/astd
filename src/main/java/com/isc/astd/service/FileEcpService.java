@@ -1,8 +1,15 @@
 package com.isc.astd.service;
 
-import com.isc.astd.domain.*;
-import com.isc.astd.service.dto.*;
+import com.isc.astd.domain.File;
+import com.isc.astd.domain.FilePosition;
+import com.isc.astd.domain.Position;
+import com.isc.astd.domain.Route;
+import com.isc.astd.domain.RoutePosition;
+import com.isc.astd.service.dto.EcpPersonDTO;
+import com.isc.astd.service.dto.PositionDTO;
+import com.isc.astd.service.dto.SignedPositionDTO;
 import com.isc.astd.service.mapper.Mapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +23,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class FileEcpService {
+
+	private final int POSITION_ID = 5;
+	private final int ROUTE_ID = 5;
 
     private final Mapper mapper;
 
@@ -121,24 +131,38 @@ public class FileEcpService {
     }
 
     boolean isNotSignedYet(User user, Position myPosition, File file, boolean canBeSigned) {
-        return canBeSigned &&
+        /*return canBeSigned &&
                 getSignedPositions(file).stream().
                         noneMatch(
                                 signedPosition -> signedPosition.getPosition().equals(myPosition) &&
                                         signedPosition.getCreatedBy().equals(user.getUsername())
-                        );
+                        );*/
+        return true;
     }
 
-    boolean isMyOrderToSign(Position myPosition, boolean isNotSignedYet, SignedPositionDTO nextSignPosition) {
-        return isNotSignedYet && nextSignPosition != null && myPosition.equals(nextSignPosition.getPosition());
+    boolean isMyOrderToSign(Position myPosition, boolean isNotSignedYet, SignedPositionDTO nextSignPosition, File file) {
+    	boolean isMyOrderToSign = isMyOrderToSign(myPosition, isNotSignedYet, nextSignPosition);
+    	if(isMyOrderToSign && myPosition.getId() == POSITION_ID && file.getRoute().getId() == ROUTE_ID) {
+		    final FilePosition prevFilePosition = file.getFilePositions().stream().filter(filePosition -> filePosition.getEcp() != null).max(Comparator.comparingInt(value -> value.getId().getOrder())).orElse(null);
+		    if(prevFilePosition != null && prevFilePosition.getId().getPosition().getId().equals(myPosition.getId())) {
+			   if(StringUtils.isBlank(file.getFioSign1()) || StringUtils.isBlank(file.getFioSign2())){
+				   isMyOrderToSign = false;
+			   }
+		    }
+	    }
+        return isMyOrderToSign;
     }
+
+	boolean isMyOrderToSign(Position myPosition, boolean isNotSignedYet, SignedPositionDTO nextSignPosition) {
+		return isNotSignedYet && nextSignPosition != null && myPosition.equals(nextSignPosition.getPosition());
+	}
 
     boolean isMyOrderToSign(File file, User user) {
         Position myPosition = userService.getUser(user.getUsername()).getPosition();
         boolean canBeSigned = isCanBeSigned(myPosition, file);
         boolean isNotSignedYet = isNotSignedYet(user, myPosition, file, canBeSigned);
         SignedPositionDTO nextSignPosition = getNextSignPosition(file);
-        return isMyOrderToSign(myPosition, isNotSignedYet, nextSignPosition);
+        return isMyOrderToSign(myPosition, isNotSignedYet, nextSignPosition/*, file*/);
     }
 
     boolean isSignedBy(Position position, File file) {
@@ -147,6 +171,24 @@ public class FileEcpService {
 
     FilePosition getSignatureFor(Position position, File file) {
         return file.getFilePositions().stream().filter(filePosition -> filePosition.getEcp() != null && filePosition.getId().getPosition().equals(position)).findFirst().orElse(null);
+    }
+
+    boolean isOriginalCheckedSigned(Position myPosition, File file){
+    	boolean signed = file.getRoute().getId() == ROUTE_ID && myPosition.getId() == POSITION_ID && StringUtils.isNotBlank(file.getFioSign1()) && StringUtils.isNotBlank(file.getFioSign2());
+    	if(signed) {
+		    signed = false;
+		    final List<FilePosition> filePositions = file.getFilePositions().stream().filter(filePosition -> filePosition.getEcp() != null && filePosition.getId().getPosition().getId() == POSITION_ID).collect(Collectors.toList());
+		    for (int i = 0; i < filePositions.size(); i++) {
+			    if(i > 0){
+				    FilePosition filePosition = filePositions.get(i);
+				    if(filePosition.getId().getOrder() - filePositions.get(i - 1).getId().getOrder() == 1){// signatures are podriad
+					    signed = true;
+					    break;
+				    }
+			    }
+		    }
+	    }
+	    return signed;
     }
 
     /*void setMyMoreSigns(List<MoreSignsDTO> dtos, FileBaseDTO fileDTO) {

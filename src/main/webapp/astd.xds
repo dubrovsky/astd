@@ -2,12 +2,12 @@
     "name": "astd",
     "settings": {
         "cmd": {
-            "license": "commercial",
-            "cmdVersion": "6.6.0.13",
-            "frameworkOverride": "D:\\WORK\\LIBS\\extjs-6.x\\ext-6.6.0"
+            "license": "custom",
+            "cmdVersion": "6.7.0.63",
+            "frameworkOverride": "D:\\WORK\\LIBS\\extjs-6.x\\6.7.0.210"
         },
         "urlPrefixTemplate": "http://localhost:{port}/{path}",
-        "urlPrefix": "http://localhost:2803/",
+        "urlPrefix": "http://localhost:14974/",
         "canvasControls": {
             "viewportSize": {
                 "name": "Auto Expand",
@@ -31,8 +31,8 @@
             "buildPlatform": false
         }
     },
-    "xdsVersion": "4.2.4",
-    "xdsBuild": 389,
+    "xdsVersion": "4.2.5",
+    "xdsBuild": 420,
     "schemaVersion": 1,
     "upgradeVersion": 310000000001,
     "framework": "ext66",
@@ -73,7 +73,13 @@
             "51efc34a-d16c-4f0f-b11f-6aa972e81e2d",
             "3a820f9e-0a53-4589-a801-a0ffaebb505a",
             "cdc575da-d41c-4dd9-8acf-96984cee247c",
-            "97827c14-df3f-45b1-b271-760d906f7b88"
+            "97827c14-df3f-45b1-b271-760d906f7b88",
+            "dd05acd5-0e24-47e7-b7d7-faaaf5a53506",
+            "e9c5c051-2c1e-4d4e-9030-4a58a04ed123",
+            "26efd51f-2e77-4d8c-a64e-431bfa8e032e",
+            "a0e1e2f7-5766-427b-ba24-f1b81976a570",
+            "3212082c-3ee0-4f15-84a3-3e8d079dc412",
+            "a864f9eb-e97f-4864-8795-614a26ea7eca"
         ],
         "store": [],
         "controller": [],
@@ -89,7 +95,7 @@
             "596bbcbf-f60c-43f5-9878-7fbf2e98493b"
         ],
         "resource": [
-            "7a736db2-6889-429f-bf65-2d0a6fe5c6c5",
+            "47f8dd26-1b98-43f6-9cb0-d45dc95c999e",
             "e609d0df-3fd9-40d8-9f9d-4a880e00b6fc",
             "b45fc1a8-393e-4c2a-8c38-2f1cd8a1cf0b",
             "cb529f2e-f15b-4ae0-873b-214dd0647344",

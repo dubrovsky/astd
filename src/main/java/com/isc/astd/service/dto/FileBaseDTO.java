@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.isc.astd.domain.File;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,12 +36,18 @@ public class FileBaseDTO {
     private boolean canBeSigned = false;
     private boolean notSignedYet = true;
     private boolean myOrderToSign = false;
+    private boolean myOrderToSignAfterUpdate = false;
+    private boolean originalCheckedSigned = false;
     private boolean hasPrevVersion = false;
     private Long prevVersionId;
     private boolean hasNextVersion = false;
     private Long nextVersionId;
     private String routePositionStatus;
     private String statusModifiedBy;
+	private String fioSign1;
+	private String fioSign2;
+	private LocalDate dateSign1;
+	private LocalDate dateSign2;
     private List<EcpPersonDTO> ecpPersons = new ArrayList<>();
 //    private List<MoreSignsDTO> moreSigns = new ArrayList<>();
 
@@ -303,7 +310,55 @@ public class FileBaseDTO {
 		this.routePositionId = routePositionId;
 	}
 
-    /*public List<MoreSignsDTO> getMoreSigns() {
+	public String getFioSign1() {
+		return fioSign1;
+	}
+
+	public void setFioSign1(String fioSign1) {
+		this.fioSign1 = fioSign1;
+	}
+
+	public String getFioSign2() {
+		return fioSign2;
+	}
+
+	public void setFioSign2(String fioSign2) {
+		this.fioSign2 = fioSign2;
+	}
+
+	public LocalDate getDateSign1() {
+		return dateSign1;
+	}
+
+	public void setDateSign1(LocalDate dateSign1) {
+		this.dateSign1 = dateSign1;
+	}
+
+	public LocalDate getDateSign2() {
+		return dateSign2;
+	}
+
+	public void setDateSign2(LocalDate dateSign2) {
+		this.dateSign2 = dateSign2;
+	}
+
+	public boolean isMyOrderToSignAfterUpdate() {
+		return myOrderToSignAfterUpdate;
+	}
+
+	public void setMyOrderToSignAfterUpdate(boolean myOrderToSignAfterUpdate) {
+		this.myOrderToSignAfterUpdate = myOrderToSignAfterUpdate;
+	}
+
+	public boolean isOriginalCheckedSigned() {
+		return originalCheckedSigned;
+	}
+
+	public void setOriginalCheckedSigned(boolean originalCheckedSigned) {
+		this.originalCheckedSigned = originalCheckedSigned;
+	}
+
+	/*public List<MoreSignsDTO> getMoreSigns() {
         return moreSigns;
     }
 

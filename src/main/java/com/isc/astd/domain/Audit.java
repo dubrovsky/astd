@@ -108,7 +108,8 @@ public class Audit {
         FILE_REJECT_CANCEL("file_reject_cancel", "отменить отклонение файла"),
         FILE_ARCHIVE("file_archive", "архивировать файл"),
         FILE_ARCHIVE_CANCEL("file_archive_cancel", "отменить архивирование файла"),
-        FILE_PAPER_COPY("file_paper_copy", "бумажная копия актуализирована")
+        FILE_PAPER_COPY("file_paper_copy", "бумажная копия актуализирована"),
+	    FILE_ORIGINAL_CHECKED("file_original_checked", "подлинник проверен")
         ;
 
         private final String code;

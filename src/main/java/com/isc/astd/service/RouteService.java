@@ -32,7 +32,7 @@ public class RouteService {
     @Transactional(readOnly = true)
     public List<RouteDTO> getAllRoutes(User user) {
 
-        return mapper.mapAsList(routeRepository.findAllByPosition(userService.getUser(user.getUsername()).getPosition()), RouteDTO.class);
+        return mapper.mapAsList(routeRepository.findAllByPositionAndExpiredDateIsNull(userService.getUser(user.getUsername()).getPosition()), RouteDTO.class);
     }
 
     public Route getRoute(long id) {

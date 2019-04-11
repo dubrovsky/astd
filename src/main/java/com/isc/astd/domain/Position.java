@@ -48,7 +48,7 @@ public class Position extends AbstractBaseEntity {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private Set<FilePosition> docPositions = new HashSet<>();
+    private Set<FilePosition> filePositions = new HashSet<>();
 
 	@JsonIgnore
 	@BatchSize(size = 50)
@@ -99,12 +99,12 @@ public class Position extends AbstractBaseEntity {
         this.routePositions = routePositions;
     }
 
-    public Set<FilePosition> getDocPositions() {
-        return docPositions;
+    public Set<FilePosition> getFilePositions() {
+        return filePositions;
     }
 
-    public void setDocPositions(Set<FilePosition> docPositions) {
-        this.docPositions = docPositions;
+    public void setFilePositions(Set<FilePosition> filePositions) {
+        this.filePositions = filePositions;
     }
 
     @Override

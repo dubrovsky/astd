@@ -1,1 +1,1 @@
-java -jar "C:\Program Files\Sencha\Cmd\6.6.0.13\sencha.jar" app build production
+java -jar "C:\Users\peter\bin\Sencha\Cmd\6.7.0.63\sencha.jar" app build production
