@@ -25,6 +25,7 @@ Ext.define('ASTD.view.file.FileHistoryFormView', {
         'Ext.button.Button',
         'Ext.form.field.Display',
         'Ext.form.field.Date',
+        'Ext.form.field.TextArea',
         'Ext.toolbar.Toolbar'
     ],
 
@@ -307,6 +308,67 @@ Ext.define('ASTD.view.file.FileHistoryFormView', {
                             }
                         }
                     ]
+                }
+            ]
+        },
+        {
+            xtype: 'fieldcontainer',
+            anchor: '100%',
+            layout: 'hbox',
+            fieldLabel: 'Тема',
+            items: [
+                {
+                    xtype: 'textareafield',
+                    reference: 'themeShchtd',
+                    margin: '0 5 0 0',
+                    width: 300,
+                    hideLabel: true,
+                    bind: {
+                        value: '{prevFileVersion.themeShchtd}'
+                    }
+                },
+                {
+                    xtype: 'button',
+                    glyph: 'xf0c7@FontAwesome',
+                    tooltip: 'Сохранить',
+                    bind: {
+                        hidden: '{isSaveThemeBtnHidden}'
+                    },
+                    listeners: {
+                        click: 'onSaveThemeBtnClick'
+                    }
+                }
+            ]
+        },
+        {
+            xtype: 'fieldcontainer',
+            anchor: '100%',
+            layout: 'hbox',
+            fieldLabel: 'Комментарий',
+            bind: {
+                hidden: '{isNoteHidden}'
+            },
+            items: [
+                {
+                    xtype: 'textareafield',
+                    reference: 'noteShl',
+                    margin: '0 5 0 0',
+                    width: 300,
+                    hideLabel: true,
+                    bind: {
+                        value: '{prevFileVersion.noteShl}'
+                    }
+                },
+                {
+                    xtype: 'button',
+                    glyph: 'xf0c7@FontAwesome',
+                    tooltip: 'Сохранить',
+                    bind: {
+                        hidden: '{isSaveNoteBtnHidden}'
+                    },
+                    listeners: {
+                        click: 'onSaveNoteBtnClick'
+                    }
                 }
             ]
         },

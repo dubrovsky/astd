@@ -69,6 +69,14 @@ Ext.define('ASTD.model.FileModel', {
             name: 'descr'
         },
         {
+            type: 'string',
+            name: 'noteShl'
+        },
+        {
+            type: 'string',
+            name: 'themeShchtd'
+        },
+        {
             type: 'int',
             name: 'routeId',
             reference: {

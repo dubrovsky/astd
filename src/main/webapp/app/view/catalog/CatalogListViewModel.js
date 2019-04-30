@@ -42,7 +42,7 @@ Ext.define('ASTD.view.catalog.CatalogListViewModel', {
                 return true;
             }
             return catalog.get('type') === 'SCHEME' || catalog.get('type') === 'ROOT' ||
-            user.get('positionId') !== 5;
+            (user.get('positionId') !== 5 && user.get('positionId') !== 9);
         },
         isEditBtnHidden: function(get) {
             var catalog = get('current.catalog');
@@ -51,7 +51,7 @@ Ext.define('ASTD.view.catalog.CatalogListViewModel', {
                 return true;
             }
             return catalog.get('type') === 'ROOT' || catalog.get('type') === 'STATION' || catalog.get('type') === 'LINE' ||
-            user.get('positionId') !== 5;
+            (user.get('positionId') !== 5 && user.get('positionId') !== 9);
         },
         isDeleteBtnHidden: {
             get: function(data) {
@@ -63,7 +63,7 @@ Ext.define('ASTD.view.catalog.CatalogListViewModel', {
                 }
                 return catalog.get('type') === 'ROOT' || catalog.get('type') === 'STATION' || catalog.get('type') === 'LINE' ||
                 catalog.get('readOnly') ||
-                user.get('positionId') !== 5;
+                (user.get('positionId') !== 5 && user.get('positionId') !== 9);
             },
             bind: {
                 bindTo: '{current.catalog}',

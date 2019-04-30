@@ -18,7 +18,8 @@ Ext.define('ASTD.view.main.MainMoreSignsListViewModel', {
     alias: 'viewmodel.main.mainmoresignslistview',
 
     requires: [
-        'Ext.data.Store'
+        'Ext.data.Store',
+        'Ext.app.bind.Formula'
     ],
 
     stores: {
@@ -26,6 +27,15 @@ Ext.define('ASTD.view.main.MainMoreSignsListViewModel', {
             remoteFilter: true,
             autoLoad: true,
             model: 'ASTD.model.MoreSignsModel'
+        }
+    },
+    formulas: {
+        isNoteHidden: function(get) {
+            var user = this.get('current.user');
+            if(!user) {
+                return true;
+            }
+            return user.get('positionId') !== 5;
         }
     }
 

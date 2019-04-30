@@ -159,6 +159,76 @@ Ext.define('ASTD.view.file.FileHistoryFormViewController', {
         });
     },
 
+    onSaveThemeBtnClick: function(button, e, eOpts) {
+        Ext.Msg.show({
+            title:'Изменить?',
+            message: 'Вы действительно хотите сохранить изменения?',
+            buttons: Ext.Msg.YESNO,
+            icon: Ext.Msg.QUESTION,
+            scope: this,
+            fn: function(btn) {
+                if(btn === 'yes') {
+                    Ext.Msg.wait('Сохранение', 'Сохранение изменений...');
+                    var currentFile = this.getViewModel().get('prevFileVersion');
+                    Ext.Ajax.request({
+                        url: currentFile.getProxy().getUrl() + '/theme/' + currentFile.getId(),
+                        method: 'POST',
+                        params: {
+                            theme: this.lookup('themeShchtd').getValue()
+                        },
+                        scope: this,
+                        callback: function(options, success, response) {
+                            Ext.Msg.hide();
+                            var responseText = Ext.decode(response.responseText);
+                            Ext.toast({
+                                title: 'Изменения',
+                                html: success ? 'Изменения успешно сохранены' : 'Ошибка',
+                                align: 'tr',
+                                bodyPadding: 10
+                            });
+                        }
+                    });
+                }
+            }
+        });
+
+    },
+
+    onSaveNoteBtnClick: function(button, e, eOpts) {
+        Ext.Msg.show({
+            title:'Изменить?',
+            message: 'Вы действительно хотите сохранить изменения?',
+            buttons: Ext.Msg.YESNO,
+            icon: Ext.Msg.QUESTION,
+            scope: this,
+            fn: function(btn) {
+                if(btn === 'yes') {
+                    Ext.Msg.wait('Сохранение', 'Сохранение изменений...');
+                    var currentFile = this.getViewModel().get('prevFileVersion');
+                    Ext.Ajax.request({
+                        url: currentFile.getProxy().getUrl() + '/note/' + currentFile.getId(),
+                        method: 'POST',
+                        params: {
+                            note: this.lookup('noteShl').getValue()
+                        },
+                        scope: this,
+                        callback: function(options, success, response) {
+                            Ext.Msg.hide();
+                            var responseText = Ext.decode(response.responseText);
+                            Ext.toast({
+                                title: 'Изменения',
+                                html: success ? 'Изменения успешно сохранены' : 'Ошибка',
+                                align: 'tr',
+                                bodyPadding: 10
+                            });
+                        }
+                    });
+                }
+            }
+        });
+
+    },
+
     onViewEcpPersonsBtnClick: function(button, e, eOpts) {
         this.fireEvent('viewEcpPersonsBtnClick', this.getView(), this.getViewModel().get('prevFileVersion'));
     },

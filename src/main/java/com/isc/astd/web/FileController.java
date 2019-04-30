@@ -153,4 +153,16 @@ public class FileController {
 		fileService.saveOriginalChecked(fileId, fioSign1, fioSign2, dateSign1, dateSign2);
 		return ResponseEntity.ok(new Response<>());
 	}
+
+	@PostMapping("/theme/{id}")
+	public ResponseEntity<Response> saveTheme(@PathVariable("id") long fileId, @RequestParam("theme") String theme) {
+		fileService.saveTheme(fileId, theme);
+		return ResponseEntity.ok(new Response<>());
+	}
+
+	@PostMapping("/note/{id}")
+	public ResponseEntity<Response> saveNote(@PathVariable("id") long fileId, @RequestParam("note") String note) {
+		fileService.saveNote(fileId, note);
+		return ResponseEntity.ok(new Response<>());
+	}
 }

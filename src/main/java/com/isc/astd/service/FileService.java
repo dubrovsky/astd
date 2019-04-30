@@ -512,6 +512,20 @@ public class FileService {
 		fileRepository.save(file);
 	}
 
+	public void saveTheme(long fileId, String theme) {
+		File file = getFile(fileId);
+		file.setThemeShchtd(theme);
+		file.setAuditAction(Audit.Action.THEME_UPDATED);
+		fileRepository.save(file);
+	}
+
+	public void saveNote(long fileId, String note) {
+		File file = getFile(fileId);
+		file.setNoteShl(note);
+		file.setAuditAction(Audit.Action.NOTE_UPDATED);
+		fileRepository.save(file);
+	}
+
 	private enum DIRECTION {
 		PREV, NEXT
 	}

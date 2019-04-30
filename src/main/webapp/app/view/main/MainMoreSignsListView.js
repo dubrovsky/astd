@@ -99,6 +99,19 @@ Ext.define('ASTD.view.main.MainMoreSignsListView', {
                     dataIndex: 'signNum',
                     text: 'На подпись',
                     format: '0'
+                },
+                {
+                    xtype: 'gridcolumn',
+                    renderer: function(value, metaData, record, rowIndex, colIndex, store, view) {
+                        metaData.style = 'white-space:normal;';
+                        return value;
+                    },
+                    flex: 2,
+                    dataIndex: 'noteShl',
+                    text: 'Комментарий',
+                    bind: {
+                        hidden: '{isNoteHidden}'
+                    }
                 }
             ],
             listeners: {

@@ -34,7 +34,7 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
         // Criteria crit = em.unwrap(Session.class).createCriteria(Foo.class);
         final Query query = em.createQuery(
                 "SELECT\n" +
-                "  d.id AS docId, d.catalog.id AS catalogId, d.npp AS npp, d.num AS num, d.descr AS descr, f.id as fileId \n" +
+                "  d.id AS docId, d.catalog.id AS catalogId, d.npp AS npp, d.num AS num, d.descr AS descr, f.id as fileId, f.noteShl as noteShl \n" +
 //                         ", COUNT(f.id) AS signNum\n" +
                 "FROM\n" +
                 "  Doc d\n" +
@@ -58,6 +58,6 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
         List<Tuple> tupleList = query.getResultList();
         return tupleList.stream().map(tuple -> new MoreSignsDTO(
                 (long)tuple.get("docId"), (long)tuple.get("catalogId"), (long)tuple.get("npp"), String.valueOf(tuple.get("num")), String.valueOf(tuple.get("descr")), /*(long)tuple.get("signNum"), */
-                (long)tuple.get("fileId"))).collect(Collectors.toList());
+                (long)tuple.get("fileId"),  String.valueOf(tuple.get("noteShl")))).collect(Collectors.toList());
     }
 }

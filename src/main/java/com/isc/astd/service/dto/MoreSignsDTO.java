@@ -14,6 +14,7 @@ public class MoreSignsDTO {
     private final long fileId;
     private final long npp;
     private final String descr;
+    private final String noteShl;
     private long signNum;
     private String shCh;
     private String stnLine;
@@ -21,7 +22,7 @@ public class MoreSignsDTO {
     @JsonFormat(pattern = "dd.MM.yyyy HH:mm:ss", timezone = "GMT+3")
     private Instant dateShch;
 
-    public MoreSignsDTO(long docId, long catalogId, long npp, String num, String descr,/* long signNum,*/ long fileId) {
+    public MoreSignsDTO(long docId, long catalogId, long npp, String num, String descr,/* long signNum,*/ long fileId, String noteShl) {
         this.docId = docId;
         this.catalogId = catalogId;
         this.npp = npp;
@@ -29,6 +30,7 @@ public class MoreSignsDTO {
         this.descr = descr;
 //        this.signNum = signNum;
         this.fileId = fileId;
+	    this.noteShl = noteShl;
     }
 
     public Long getDocId() {
@@ -98,4 +100,8 @@ public class MoreSignsDTO {
     public int hashCode() {
         return 31;
     }
+
+	public String getNoteShl() {
+		return noteShl;
+	}
 }

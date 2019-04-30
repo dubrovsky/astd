@@ -69,7 +69,7 @@ Ext.define('ASTD.view.file.FileHistoryFormViewModel', {
             var file = get('prevFileVersion');
             var user = this.get('current.user');
             if(!file || !user) {
-                return '';
+                return true;
             }
 
             return (file.get('branchType') === 'DEFAULT' && (!file.get('myOrderToSign') || user.get('positionId') !== 5 || file.get('routeId') !== 5)) ||
@@ -81,6 +81,31 @@ Ext.define('ASTD.view.file.FileHistoryFormViewModel', {
                 return false;
             }
             return file.get('branchType') !== 'DEFAULT' || file.get('originalCheckedSigned');
+        },
+        isSaveThemeBtnHidden: function(get) {
+            var file = get('prevFileVersion');
+            var user = this.get('current.user');
+            if(!file || !user) {
+                return true;
+            }
+            return (file.get('branchType') === 'DEFAULT' && user.get('positionId') !== 5 && user.get('positionId') !== 9) ||
+            file.get('branchType') !== 'DEFAULT';
+        },
+        isSaveNoteBtnHidden: function(get) {
+            var file = get('prevFileVersion');
+            var user = this.get('current.user');
+            if(!file || !user) {
+                return true;
+            }
+            return (file.get('branchType') === 'DEFAULT' && user.get('positionId') !== 5) ||
+            file.get('branchType') !== 'DEFAULT';
+        },
+        isNoteHidden: function(get) {
+            var user = this.get('current.user');
+            if(!user) {
+                return true;
+            }
+            return user.get('positionId') !== 5;
         },
         isPrevVersionBtnHidden: {
             get: function(data) {

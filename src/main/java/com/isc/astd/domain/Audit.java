@@ -109,7 +109,9 @@ public class Audit {
         FILE_ARCHIVE("file_archive", "архивировать файл"),
         FILE_ARCHIVE_CANCEL("file_archive_cancel", "отменить архивирование файла"),
         FILE_PAPER_COPY("file_paper_copy", "бумажная копия актуализирована"),
-	    FILE_ORIGINAL_CHECKED("file_original_checked", "подлинник проверен")
+	    FILE_ORIGINAL_CHECKED("file_original_checked", "подлинник проверен"),
+	    THEME_UPDATED("theme_updated", "тема обновлена"),
+	    NOTE_UPDATED("note_updated", "комментарий обновлен")
         ;
 
         private final String code;

@@ -41,6 +41,10 @@ Ext.define('ASTD.model.MoreSignsModel', {
             name: 'descr'
         },
         {
+            type: 'string',
+            name: 'noteShl'
+        },
+        {
             type: 'int',
             name: 'signNum'
         },

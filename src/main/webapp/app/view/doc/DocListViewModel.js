@@ -41,7 +41,7 @@ Ext.define('ASTD.view.doc.DocListViewModel', {
                 return true;
             }
 
-            isHidden = user.get('positionId') !== 5;
+            isHidden = user.get('positionId') !== 5 && user.get('positionId') !== 9;
             return isHidden;
         },
         isEditBtnHidden: function(get) {
@@ -53,7 +53,7 @@ Ext.define('ASTD.view.doc.DocListViewModel', {
             }
 
 
-            isHidden = user.get('positionId') !== 5;
+            isHidden = user.get('positionId') !== 5 && user.get('positionId') !== 9;
 
             if(!isHidden) {
                 var doc = get('current.doc');
@@ -72,7 +72,7 @@ Ext.define('ASTD.view.doc.DocListViewModel', {
                 return true;
             }
 
-            isHidden = user.get('positionId') !== 5;
+            isHidden = user.get('positionId') !== 5 && user.get('positionId') !== 9;
 
             if(!isHidden) {
                 var doc = get('current.doc');

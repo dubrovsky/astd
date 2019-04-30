@@ -18,13 +18,23 @@ Ext.define('ASTD.view.file.FileFormViewModel', {
     alias: 'viewmodel.file.fileformview',
 
     requires: [
-        'Ext.data.Store'
+        'Ext.data.Store',
+        'Ext.app.bind.Formula'
     ],
 
     stores: {
         routeStore: {
             autoLoad: true,
             model: 'ASTD.model.RouteModel'
+        }
+    },
+    formulas: {
+        isThemeHidden: function(get) {
+            var user = this.get('current.user');
+            if(!user) {
+                return true;
+            }
+            return user.get('positionId') !== 9;
         }
     }
 

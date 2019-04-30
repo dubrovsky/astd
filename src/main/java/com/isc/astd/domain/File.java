@@ -63,8 +63,16 @@ public class File extends AbstractBaseEntity {
     private boolean paperShChTD = false;
 
     @Size(max = 512)
-    @Column(name = "descr", length = 512)
-    private String descr;
+    @Column(name = "note_shl", length = 512)
+    private String noteShl;
+
+	@Size(max = 512)
+	@Column(name = "theme_shchtd", length = 512)
+	private String themeShchtd;
+
+	@Size(max = 512)
+	@Column(name = "descr", length = 512)
+	private String descr;
 
     @NotNull
     @Size(min = 1, max = 128)
@@ -299,6 +307,22 @@ public class File extends AbstractBaseEntity {
 
 	public void setDateSign2(LocalDate dateSign2) {
 		this.dateSign2 = dateSign2;
+	}
+
+	public String getNoteShl() {
+		return noteShl;
+	}
+
+	public void setNoteShl(String noteShl) {
+		this.noteShl = noteShl;
+	}
+
+	public String getThemeShchtd() {
+		return themeShchtd;
+	}
+
+	public void setThemeShchtd(String themeShchtd) {
+		this.themeShchtd = themeShchtd;
 	}
 
    /* public void removeFilePosition(FilePosition filePosition) {

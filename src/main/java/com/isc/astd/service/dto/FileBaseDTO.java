@@ -26,6 +26,8 @@ public class FileBaseDTO {
     private boolean paperShL;
     private boolean paperShChTD;
     private String descr;
+    private String noteShl;
+    private String themeShchtd;
     private String contentType;
     @JsonFormat(pattern = "dd.MM.yyyy HH:mm:ss", timezone = "GMT+3")
     private Instant createdDate;
@@ -356,6 +358,22 @@ public class FileBaseDTO {
 
 	public void setOriginalCheckedSigned(boolean originalCheckedSigned) {
 		this.originalCheckedSigned = originalCheckedSigned;
+	}
+
+	public String getNoteShl() {
+		return noteShl;
+	}
+
+	public void setNoteShl(String noteShl) {
+		this.noteShl = noteShl;
+	}
+
+	public String getThemeShchtd() {
+		return themeShchtd;
+	}
+
+	public void setThemeShchtd(String themeShchtd) {
+		this.themeShchtd = themeShchtd;
 	}
 
 	/*public List<MoreSignsDTO> getMoreSigns() {

@@ -91,6 +91,16 @@ Ext.define('ASTD.view.file.FileFormView', {
                     }
                 },
                 {
+                    xtype: 'textareafield',
+                    anchor: '100%',
+                    fieldLabel: 'Тема',
+                    name: 'themeShchtd',
+                    bind: {
+                        hidden: '{isThemeHidden}',
+                        value: '{currentFile.themeShchtd}'
+                    }
+                },
+                {
                     xtype: 'hiddenfield',
                     name: 'docId',
                     bind: {
