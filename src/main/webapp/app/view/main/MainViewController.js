@@ -278,6 +278,21 @@ Ext.define('ASTD.view.main.MainViewController', {
         win.show();
         Ext.Msg.wait("Загрузка", "Загрузка списка");
         // win.getViewModel().getStore('moreSignsStore').load();
+    },
+
+    onMoreRejectedBtnClick: function(button, e, eOpts) {
+        var centerRegion = this.getView().getLayout().centerRegion;
+        var win = new ASTD.view.main.MainMoreRejectedListView({
+            viewModel: {
+                data: {
+                    tree: this.lookup('catalogList'),
+                    view: centerRegion ? centerRegion : null
+                }
+            }
+        });
+        win.show();
+        Ext.Msg.wait("Загрузка", "Загрузка списка");
+        // win.getViewModel().getStore('moreSignsStore').load();
     }
 
 });

@@ -1,6 +1,7 @@
 package com.isc.astd.web;
 
 import com.isc.astd.service.MainService;
+import com.isc.astd.service.dto.MoreRejectedDTO;
 import com.isc.astd.service.dto.MoreSignsDTO;
 import com.isc.astd.web.commons.Response;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +27,14 @@ public class MainController {
     }
 
     @GetMapping("/moresigns")
-    public ResponseEntity<Response<MoreSignsDTO>> getAllFiles(@AuthenticationPrincipal User principal){
+    public ResponseEntity<Response<MoreSignsDTO>> getMoreSigns(@AuthenticationPrincipal User principal){
         List<MoreSignsDTO> moreSigns = mainService.getMoreSigns(principal);
         return ResponseEntity.ok(new Response<>(moreSigns));
     }
+
+	@GetMapping("/morerejected")
+	public ResponseEntity<Response<MoreRejectedDTO>> getMoreRejected(@AuthenticationPrincipal User principal){
+		List<MoreRejectedDTO> moreRejected = mainService.getMoreRejected(principal);
+		return ResponseEntity.ok(new Response<>(moreRejected));
+	}
 }

@@ -1,6 +1,7 @@
 package com.isc.astd.repository;
 
 import com.isc.astd.domain.Doc;
+import com.isc.astd.service.dto.MoreRejectedDTO;
 import com.isc.astd.service.dto.MoreSignsDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaContext;
@@ -57,7 +58,39 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
         }
         List<Tuple> tupleList = query.getResultList();
         return tupleList.stream().map(tuple -> new MoreSignsDTO(
-                (long)tuple.get("docId"), (long)tuple.get("catalogId"), (long)tuple.get("npp"), String.valueOf(tuple.get("num")), String.valueOf(tuple.get("descr")), /*(long)tuple.get("signNum"), */
-                (long)tuple.get("fileId"),  String.valueOf(tuple.get("noteShl")))).collect(Collectors.toList());
+			    (long) tuple.get("docId"), (long) tuple.get("catalogId"), (long) tuple.get("npp"), String.valueOf(tuple.get("num")), String.valueOf(tuple.get("descr")), /*(long)tuple.get("signNum"), */
+			    (long) tuple.get("fileId"), String.valueOf(tuple.get("noteShl")))).collect(Collectors.toList());
     }
+
+	@Override
+    public List<MoreRejectedDTO> findDocsWithRejectedFiles(long nextSignPositionId, String userId, Long rootCatalogId) {
+		// Criteria crit = em.unwrap(Session.class).createCriteria(Foo.class);
+		final Query query = em.createQuery(
+				"SELECT\n" +
+						"  d.id AS docId, d.catalog.id AS catalogId, d.npp AS npp, d.num AS num, d.descr AS descr, f.id as fileId, f.noteShl as noteShl \n" +
+						"FROM\n" +
+						"  Doc d\n" +
+						"  JOIN d.files f\n" +
+						"WHERE f.status = 'rejected' \n" +
+                "  AND EXISTS\n" +
+                "  (SELECT\n" +
+                "    fp.id.file.id\n" +
+                "  FROM\n" +
+                "    FilePosition fp\n" +
+                "  WHERE fp.id.file.id = f.id AND fp.createdBy = :userId)\n" +
+				(rootCatalogId != null ? " AND d.rootCatalog.id = :rootCatalogId\n" : "")
+				, Tuple.class
+		);
+//		query.setParameter("nextSignPositionId", nextSignPositionId);
+        query.setParameter("userId", userId);
+		if(rootCatalogId != null){
+			query.setParameter("rootCatalogId", rootCatalogId);
+		}
+		List<Tuple> tupleList = query.getResultList();
+		return tupleList.stream().map(tuple -> new MoreRejectedDTO(
+				(long) tuple.get("docId"), (long) tuple.get("catalogId"), (long) tuple.get("npp"), String.valueOf(tuple.get("num")), String.valueOf(tuple.get("descr")), /*(long)tuple.get("signNum"), */
+				(long) tuple.get("fileId"), String.valueOf(tuple.get("noteShl")))).collect(Collectors.toList());
+	}
+
+
 }

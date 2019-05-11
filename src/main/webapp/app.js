@@ -29,7 +29,8 @@ Ext.application({
         'EcpPersonModel',
         'UserModel',
         'MoreSignsModel',
-        'AuditModel'
+        'AuditModel',
+        'MoreRejectedModel'
     ],
     views: [
         'main.MainView',
@@ -45,7 +46,8 @@ Ext.application({
         'audit.AuditListView',
         'main.MainMoreSignsListView',
         'doc.DocDeclineFormView',
-        'doc.DocEcpPersonsListView'
+        'doc.DocEcpPersonsListView',
+        'main.MainMoreRejectedListView'
     ],
     name: 'ASTD',
 

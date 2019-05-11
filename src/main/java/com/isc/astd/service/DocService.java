@@ -4,6 +4,7 @@ import com.isc.astd.domain.*;
 import com.isc.astd.repository.DocRepository;
 import com.isc.astd.repository.specification.DocSpecification;
 import com.isc.astd.service.dto.DocDTO;
+import com.isc.astd.service.dto.MoreRejectedDTO;
 import com.isc.astd.service.dto.MoreSignsDTO;
 import com.isc.astd.service.dto.PageRequestDTO;
 import com.isc.astd.service.dto.PageableDTO;
@@ -136,10 +137,6 @@ public class DocService {
 
     @Transactional(readOnly = true)
     List<MoreSignsDTO> getMoreSigns(com.isc.astd.domain.User user) {
-//        Doc doc = getDoc(file.getDoc().getId());
-//        final com.isc.astd.domain.User user1 = userService.getUser(user.getUsername());
-//        if(file.getNextSignPosition() != null){
-
         List<MoreSignsDTO> moreSignsDTOS = docRepository.findDocsWithFilesToSign(
                 user.getPosition().getId(),
                 user.getId(),
@@ -172,25 +169,48 @@ public class DocService {
             }
         }));
 
-        /*docsById.values().forEach(moreSignsDTO -> {
-            Catalog catalog = catalogService.getCatalog(moreSignsDTO.getCatalogId());
-            moreSignsDTO.setStnLine(catalog.getName());
-            moreSignsDTO.setShCh(catalogService.getRootCatalog(catalog).getName());
-            Doc doc = getDoc(moreSignsDTO.getDocId());
-            doc.getFiles().forEach(
-                    file -> file.getFilePositions().stream().filter(
-                            filePosition -> filePosition.getEcp() != null && filePosition.getId().getPosition().getId() == 6));    
-            // fileEcpService.isSignedBy();
-
-        });*/
         return result;
-//        }
-//        return Collections.emptyList();
     }
+
+	@Transactional(readOnly = true)
+	List<MoreRejectedDTO> getMoreRejected(com.isc.astd.domain.User user) {
+		List<MoreRejectedDTO> moreRejectedDTOS = docRepository.findDocsWithRejectedFiles(
+				user.getPosition().getId(),
+				user.getId(),
+				user.getRootCatalog() != null ? user.getRootCatalog().getId() : null
+		);
+
+		final Map<Long, List<MoreRejectedDTO>> docsById = moreRejectedDTOS.stream().collect(Collectors.groupingBy(MoreRejectedDTO::getDocId));
+
+		List<MoreRejectedDTO> result = new ArrayList<>(docsById.size());
+		docsById.values().forEach(docs -> docs.forEach(moreRejectedDTO -> {
+			if(!result.contains(moreRejectedDTO)) {
+				Catalog catalog = catalogService.getCatalog(moreRejectedDTO.getCatalogId());
+				moreRejectedDTO.setStnLine(catalog.getName());
+				moreRejectedDTO.setShCh(catalogService.getRootCatalog(catalog).getName());
+				moreRejectedDTO.setSignNum(docs.size());
+
+				final List<FilePosition> filePositions =
+						docs.stream().
+								filter(moreSignsDTO1 ->
+										fileEcpService.isSignedBy(positionService.getPosition(6), fileService.getFile(moreSignsDTO1.getFileId()))
+								).
+								map(
+										moreSignsDTO1 -> fileEcpService.getSignatureFor(positionService.getPosition(6), fileService.getFile(moreSignsDTO1.getFileId()))
+								).
+								collect(Collectors.toList());
+
+				moreRejectedDTO.setDateShch(filePositions.stream().map(AbstractAuditingEntity::getCreatedDate).min(Instant::compareTo).orElse(null));
+
+				result.add(moreRejectedDTO);
+			}
+		}));
+
+		return result;
+	}
 
     public DocDTO getDocById(long docId, User principal, File.BranchType branchType) {
         Doc doc = getDoc(docId);
-        DocDTO docDTO = getDoc(branchType, principal, doc);
-        return docDTO;
+	    return getDoc(branchType, principal, doc);
     }
 }

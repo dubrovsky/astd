@@ -136,10 +136,22 @@ Ext.define('ASTD.view.main.MainView', {
                                 },
                                 {
                                     xtype: 'button',
-                                    glyph: 'xf002@FontAwesome',
+                                    glyph: 'xf040@FontAwesome',
                                     text: 'На подпись',
                                     listeners: {
                                         click: 'onMoreSignsBtnClick'
+                                    }
+                                },
+                                {
+                                    xtype: 'tbseparator'
+                                },
+                                {
+                                    xtype: 'button',
+                                    style: 'border: medium solid red;',
+                                    glyph: 'xf05e@FontAwesome',
+                                    text: 'Отклоненные',
+                                    listeners: {
+                                        click: 'onMoreRejectedBtnClick'
                                     }
                                 }
                             ]
