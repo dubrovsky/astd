@@ -1,11 +1,8 @@
 package com.isc.astd.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.data.annotation.CreatedDate;
-
 import javax.persistence.*;
 import javax.validation.constraints.Size;
-import java.time.Instant;
+import java.time.LocalDate;
 
 /**
  * @author p.dzeviarylin
@@ -15,7 +12,6 @@ import java.time.Instant;
 public class User extends AbstractAuditingEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
 
     @Size(max = 64)
@@ -31,7 +27,7 @@ public class User extends AbstractAuditingEntity {
     private String organization;
 
     @Column(name = "expired_date")
-    private Instant expiredDate;
+    private LocalDate expiredDate;
 
     /*@Column(name = "root_cat_id")
     private long rootCatId;*/
@@ -93,11 +89,11 @@ public class User extends AbstractAuditingEntity {
         this.position = position;
     }
 
-    public Instant getExpiredDate() {
+    public LocalDate getExpiredDate() {
         return expiredDate;
     }
 
-    public void setExpiredDate(Instant expiredDate) {
+    public void setExpiredDate(LocalDate expiredDate) {
         this.expiredDate = expiredDate;
     }
 
@@ -106,8 +102,8 @@ public class User extends AbstractAuditingEntity {
         return "User{" +
           "id='" + id + '\'' +
           ", name='" + name + '\'' +
-          ", position=" + position +
-          ", rootCatId=" + (rootCatalog != null ? rootCatalog.getId() : "") +
+//          ", position=" + position +     // session closed exception when delete user
+//          ", rootCatId=" + (rootCatalog != null ? rootCatalog.getId() : "") +
           ", organization='" + organization + '\'' +
           ", expiredDate=" + expiredDate +
           '}';

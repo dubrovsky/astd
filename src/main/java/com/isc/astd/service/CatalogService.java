@@ -1,10 +1,10 @@
 package com.isc.astd.service;
 
-import com.isc.astd.domain.Catalog;
 import com.isc.astd.domain.Audit;
+import com.isc.astd.domain.Catalog;
 import com.isc.astd.domain.User;
 import com.isc.astd.repository.CatalogRepository;
-import com.isc.astd.security.SecurityUtils;
+import com.isc.astd.service.dto.CatalogBaseDTO;
 import com.isc.astd.service.dto.CatalogDTO;
 import com.isc.astd.service.mapper.Mapper;
 import org.springframework.stereotype.Service;
@@ -40,11 +40,11 @@ public class CatalogService {
     }
 
     @Transactional(readOnly = true)
-    public List<CatalogDTO> getAllCatalogs() {
+    public List<CatalogDTO> getCatalogs(org.springframework.security.core.userdetails.User principal) {
 
 //        List<CatalogDTO> catalogDTOS = mapper.mapAsList(catalogRepository.findAllByType(Catalog.Type.ROOT), CatalogDTO.class);
 
-        User user = userService.getUser(SecurityUtils.getCurrentUserLogin());
+        User user = userService.getUser(principal.getUsername());
         List<CatalogDTO> catalogDTOS;
         if(user.getRootCatalog() != null) {
             catalogDTOS = mapper.mapAsList(catalogRepository.findAllById(Collections.singleton(user.getRootCatalog().getId())), CatalogDTO.class);
@@ -136,5 +136,10 @@ public class CatalogService {
             catalogDTO.setP
         }*/
         return catalogDTO;
+    }
+
+    @Transactional(readOnly = true)
+    public List<CatalogBaseDTO> getAllRootCatalogs() {
+        return mapper.mapAsList(catalogRepository.findAllByType(Catalog.Type.ROOT), CatalogBaseDTO.class);
     }
 }

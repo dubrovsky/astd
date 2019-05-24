@@ -19,7 +19,7 @@ public interface AuditRepository extends JpaRepository<Audit, Long> {
     Page<Audit> findAllByEntityTypeAndEntityId(String entityType, Long entityId, Pageable pageRequest);
 
     @Query("SELECT max(a.commitVersion) FROM Audit a where a.entityType = :type and a.entityId = :entityId")
-    Integer findMaxCommitVersion(@Param("type") String type, @Param("entityId") Long entityId);
+    Integer findMaxCommitVersion(@Param("type") String type, @Param("entityId") String entityId);
 
     @Query("SELECT DISTINCT (a.entityType) from Audit a")
     List<String> findAllEntityTypes();

@@ -7,7 +7,7 @@
             "frameworkOverride": "D:\\WORK\\LIBS\\extjs-6.x\\6.7.0.210"
         },
         "urlPrefixTemplate": "http://localhost:{port}/{path}",
-        "urlPrefix": "http://localhost:4242/",
+        "urlPrefix": "http://localhost:12119/",
         "canvasControls": {
             "viewportSize": {
                 "name": "Auto Expand",
@@ -82,13 +82,20 @@
             "26efd51f-2e77-4d8c-a64e-431bfa8e032e",
             "a0e1e2f7-5766-427b-ba24-f1b81976a570",
             "3212082c-3ee0-4f15-84a3-3e8d079dc412",
-            "a864f9eb-e97f-4864-8795-614a26ea7eca"
+            "a864f9eb-e97f-4864-8795-614a26ea7eca",
+            "9e5557eb-7e00-4f51-9dba-1517e453bfdc",
+            "562c82c1-ee1c-4df8-a5bc-53725d8a481d",
+            "ae7a24e1-675e-4c07-8622-9f44b6bba15c",
+            "b974b315-7852-4a43-a3e6-6a7655953afb",
+            "7a81453c-04f6-434a-bdad-94f2a4414649",
+            "fd0f0d9d-19b0-4eab-b7c0-784b5ab63379"
         ],
         "store": [],
         "controller": [],
         "model": [
             "3dacd1b4-ba82-47a5-95f6-f0857747b3ff",
             "dd5e07c6-ce83-4957-a1b4-6ca42e40de72",
+            "5499eff0-bb22-4212-960c-70cb12c1c079",
             "08b527f2-7502-433b-9687-9c0e23b84ce5",
             "f0a90ffc-3480-4ae3-95a1-7ff0254d0af6",
             "31852eef-5054-4876-95b4-e304f8134968",
@@ -99,7 +106,7 @@
             "596bbcbf-f60c-43f5-9878-7fbf2e98493b"
         ],
         "resource": [
-            "6982b764-1bda-4099-bd4f-f3229eea87b1",
+            "92346777-fb0c-4fcd-8dc0-b90a8168e266",
             "e609d0df-3fd9-40d8-9f9d-4a880e00b6fc",
             "b45fc1a8-393e-4c2a-8c38-2f1cd8a1cf0b",
             "cb529f2e-f15b-4ae0-873b-214dd0647344",

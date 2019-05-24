@@ -14,6 +14,11 @@ public class Mapper extends ConfigurableMapper {
 
     @Override
     protected void configure(MapperFactory factory) {
+
+        factory.classMap(Catalog.class, CatalogBaseDTO.class)
+                .byDefault()
+                .register();
+
         factory.classMap(Catalog.class, CatalogDTO.class)
                 .field("parentCatalog.id", "parentCatalogId")
                 .field("name", "text")
@@ -61,12 +66,20 @@ public class Mapper extends ConfigurableMapper {
                 .register();
 
         factory.classMap(User.class, UserDTO.class)
-                .field("position.name", "positionName")
-                .field("position.id", "positionId")
-                .field("rootCatalog.id", "rootCatalogId")
-                .fieldAToB("id", "id")
+                .fieldAToB("position.name", "positionName")
+                .fieldAToB("position.id", "positionId")
+                .fieldAToB("rootCatalog.id", "rootCatalogId")
+                .fieldAToB("rootCatalog.name", "rootCatalogName")
                 .byDefault()
                 .register();
+
+	    factory.classMap(User.class, UserBaseDTO.class)
+			    .fieldAToB("position.id", "positionId")
+			    .fieldAToB("rootCatalog.id", "rootCatalogId")
+			    .fieldAToB("id", "prevId")
+			    .field("id", "id")
+			    .byDefault()
+			    .register();
 
         factory.classMap(Audit.class, AuditDTO.class)
                 .exclude("createdBy")

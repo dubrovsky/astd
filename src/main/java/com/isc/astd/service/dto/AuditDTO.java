@@ -10,7 +10,7 @@ import java.time.Instant;
 public class AuditDTO {
 
     private Long id;
-    private Long entityId;
+    private String entityId;
     private String entityType;
     private String action;
     private String entityValue;
@@ -29,11 +29,11 @@ public class AuditDTO {
         this.id = id;
     }
 
-    public Long getEntityId() {
+    public String getEntityId() {
         return entityId;
     }
 
-    public void setEntityId(Long entityId) {
+    public void setEntityId(String entityId) {
         this.entityId = entityId;
     }
 

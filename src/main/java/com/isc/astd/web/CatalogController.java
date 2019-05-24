@@ -1,9 +1,12 @@
 package com.isc.astd.web;
 
 import com.isc.astd.service.CatalogService;
+import com.isc.astd.service.dto.CatalogBaseDTO;
 import com.isc.astd.service.dto.CatalogDTO;
 import com.isc.astd.web.commons.Response;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -24,8 +27,8 @@ public class CatalogController {
     }
 
     @GetMapping("/root")
-    public ResponseEntity<Response<CatalogDTO>> getAllCatalogs(){
-        List<CatalogDTO> catalogDTOS = catalogService.getAllCatalogs();
+    public ResponseEntity<Response<CatalogDTO>> getCatalogs(@AuthenticationPrincipal User principal){
+        List<CatalogDTO> catalogDTOS = catalogService.getCatalogs(principal);
         return ResponseEntity.ok(new Response<>(catalogDTOS));
     }
 
@@ -51,5 +54,11 @@ public class CatalogController {
     public ResponseEntity<Response<CatalogDTO>> getCatalog(@PathVariable("id") long catalogId) {
         CatalogDTO catalogDTO = catalogService.getCatalogById(catalogId);
         return ResponseEntity.ok(new Response<>(catalogDTO));
+    }
+
+    @GetMapping()
+    public ResponseEntity<Response<CatalogBaseDTO>> getAllRootCatalogs(){
+        List<CatalogBaseDTO> catalogDTOS = catalogService.getAllRootCatalogs();
+        return ResponseEntity.ok(new Response<>(catalogDTOS));
     }
 }

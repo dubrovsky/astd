@@ -11,5 +11,5 @@ import java.util.List;
 public interface DocRepositoryCustom {
 	List<MoreSignsDTO> findDocsWithFilesToSign(long nextSignPositionId, String userId, Long rootCatalogId);
 
-	List<MoreRejectedDTO> findDocsWithRejectedFiles(long nextSignPositionId, String userId, Long rootCatalogId);
+	List<MoreRejectedDTO> findDocsWithRejectedFiles(String userId, Long positionId, Long rootCatalogId);
 }

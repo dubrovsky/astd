@@ -22,7 +22,7 @@ public class Audit {
 
     @NotNull
     @Column(name = "entity_id", nullable = false)
-    private Long entityId;
+    private String entityId;
 
     @NotNull
     @Size(max = 255)
@@ -99,6 +99,9 @@ public class Audit {
         DOC_CREATE("doc_create", "создать документ"),
         DOC_UPDATE("doc_update", "обновить документ"),
         DOC_DELETE("doc_delete", "удалить документ"),
+	    USER_CREATE("user_create", "создать пользователя"),
+	    USER_UPDATE("user_update", "обновить пользователя"),
+	    USER_DELETE("user_delete", "удалить пользователя"),
         FILE_CREATE("file_create", "создать файл"),
         FILE_UPDATE("file_update", "обновить файл"),
         FILE_DELETE("file_delete", "удалить файл"),
@@ -131,11 +134,11 @@ public class Audit {
         }
     }
 
-    public Long getEntityId() {
+    public String getEntityId() {
         return entityId;
     }
 
-    public void setEntityId(Long entityId) {
+    public void setEntityId(String entityId) {
         this.entityId = entityId;
     }
 

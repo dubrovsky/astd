@@ -35,6 +35,7 @@ Ext.define('ASTD.view.doc.DocListView', {
     glyph: 'xf0ce@FontAwesome',
     enableColumnHide: false,
     enableColumnMove: false,
+    sortableColumns: false,
 
     bind: {
         title: '{breadCrumbs}Чертежи',

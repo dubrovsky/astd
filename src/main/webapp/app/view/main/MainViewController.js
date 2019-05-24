@@ -180,6 +180,11 @@ Ext.define('ASTD.view.main.MainViewController', {
             this.getView().remove(list);
         }
 
+        list = this.lookupReference('userList');
+        if(list){
+            this.getView().remove(list);
+        }
+
         if(record.get('isCatalog')){
             var catalogList = this.lookupReference('catalogList');
             if(!catalogList.getSelectionModel().isSelected(record)){
@@ -220,6 +225,12 @@ Ext.define('ASTD.view.main.MainViewController', {
 
             if(record.getId() === 'audit'){
                 list = new ASTD.view.audit.AuditListView({
+                    region: 'center'
+                });
+            }
+
+            if(record.getId() === 'user'){
+                list = new ASTD.view.user.UserListView({
                     region: 'center'
                 });
             }

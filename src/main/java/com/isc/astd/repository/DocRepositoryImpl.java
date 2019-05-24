@@ -63,7 +63,7 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
     }
 
 	@Override
-    public List<MoreRejectedDTO> findDocsWithRejectedFiles(long nextSignPositionId, String userId, Long rootCatalogId) {
+    public List<MoreRejectedDTO> findDocsWithRejectedFiles(String userId, Long positionId, Long rootCatalogId) {
 		// Criteria crit = em.unwrap(Session.class).createCriteria(Foo.class);
 		final Query query = em.createQuery(
 				"SELECT\n" +
@@ -77,12 +77,14 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
                 "    fp.id.file.id\n" +
                 "  FROM\n" +
                 "    FilePosition fp\n" +
-                "  WHERE fp.id.file.id = f.id AND fp.createdBy = :userId)\n" +
+//                "  WHERE fp.id.file.id = f.id AND fp.createdBy = :userId)\n" +
+                "  WHERE fp.id.file.id = f.id AND fp.id.position.id = :positionId AND fp.createdBy = :userId AND fp.ecp IS NOT NULL)\n" +
 				(rootCatalogId != null ? " AND d.rootCatalog.id = :rootCatalogId\n" : "")
 				, Tuple.class
 		);
 //		query.setParameter("nextSignPositionId", nextSignPositionId);
         query.setParameter("userId", userId);
+        query.setParameter("positionId", positionId);
 		if(rootCatalogId != null){
 			query.setParameter("rootCatalogId", rootCatalogId);
 		}

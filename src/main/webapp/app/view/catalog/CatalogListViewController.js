@@ -50,7 +50,8 @@ Ext.define('ASTD.view.catalog.CatalogListViewController', {
     },
 
     addMenuItems: function(rootNode) {
-                rootNode.appendChild({text:'Журнал аудита', glyph:'xf02d@FontAwesome', leaf:true, id:'audit', isCatalog:false}, true);
+        rootNode.appendChild({text:'Пользователи', glyph:'xf0c0@FontAwesome', leaf:true, id:'user', isCatalog:false}, true);
+        rootNode.appendChild({text:'Журнал аудита', glyph:'xf02d@FontAwesome', leaf:true, id:'audit', isCatalog:false}, true);
     },
 
     onTreepanelItemClick: function(dataview, record, item, index, e, eOpts) {

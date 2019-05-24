@@ -18,10 +18,21 @@ Ext.define('ASTD.model.UserModel', {
 
     requires: [
         'Ext.data.field.String',
+        'Ext.data.field.Date',
         'Ext.data.field.Integer'
     ],
 
     fields: [
+        {
+            type: 'string',
+            name: 'id',
+            persist: true
+        },
+        {
+            type: 'string',
+            name: 'prevId',
+            persist: true
+        },
         {
             type: 'string',
             name: 'name'
@@ -32,7 +43,16 @@ Ext.define('ASTD.model.UserModel', {
         },
         {
             type: 'string',
+            name: 'rootCatalogName'
+        },
+        {
+            type: 'string',
             name: 'organization'
+        },
+        {
+            type: 'date',
+            name: 'expiredDate',
+            dateFormat: 'd.m.Y'
         },
         {
             type: 'int',
@@ -40,6 +60,7 @@ Ext.define('ASTD.model.UserModel', {
         },
         {
             type: 'int',
+            allowNull: true,
             name: 'rootCatalogId'
         }
     ]

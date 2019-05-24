@@ -175,8 +175,8 @@ public class DocService {
 	@Transactional(readOnly = true)
 	List<MoreRejectedDTO> getMoreRejected(com.isc.astd.domain.User user) {
 		List<MoreRejectedDTO> moreRejectedDTOS = docRepository.findDocsWithRejectedFiles(
-				user.getPosition().getId(),
 				user.getId(),
+				user.getPosition().getId(),
 				user.getRootCatalog() != null ? user.getRootCatalog().getId() : null
 		);
 

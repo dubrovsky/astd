@@ -30,7 +30,8 @@ Ext.application({
         'UserModel',
         'MoreSignsModel',
         'AuditModel',
-        'MoreRejectedModel'
+        'MoreRejectedModel',
+        'PositionModel'
     ],
     views: [
         'main.MainView',
@@ -47,7 +48,9 @@ Ext.application({
         'main.MainMoreSignsListView',
         'doc.DocDeclineFormView',
         'doc.DocEcpPersonsListView',
-        'main.MainMoreRejectedListView'
+        'main.MainMoreRejectedListView',
+        'user.UserListView',
+        'user.UserFormView'
     ],
     name: 'ASTD',
 

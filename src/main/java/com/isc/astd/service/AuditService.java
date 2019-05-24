@@ -66,12 +66,12 @@ public class AuditService {
         Class<?> entityClass = entity.getClass(); // Retrieve entity class with reflection
 
         auditedEntity.setEntityType(entityClass.getSimpleName());
-        Long entityId;
+        String entityId;
         String entityData;
         try {
             Field privateLongField = getField(entityClass,"id");
             privateLongField.setAccessible(true);
-            entityId = (Long) privateLongField.get(entity);
+            entityId = String.valueOf(privateLongField.get(entity));
             privateLongField.setAccessible(false);
             entityData = objectMapper.writerWithDefaultPrettyPrinter().withView(Views.Audit.class).writeValueAsString(entity);
         } catch (IllegalArgumentException | IllegalAccessException | SecurityException |

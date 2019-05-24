@@ -3,18 +3,15 @@ package com.isc.astd.service.dto;
 import com.isc.astd.domain.Catalog;
 import com.isc.astd.domain.File;
 
-import javax.validation.constraints.NotNull;
 import java.util.TreeSet;
 
 /**
  * @author p.dzeviarylin
  */
-public class CatalogDTO implements Comparable<CatalogDTO>{
+public class CatalogDTO extends CatalogBaseDTO {
 
-    private Long id;
     private Long realId;
     private Long parentCatalogId;
-    private String name;
     private boolean readOnly;
     private int level;
     private Catalog.Type type = Catalog.Type.DEFAULT;
@@ -32,23 +29,15 @@ public class CatalogDTO implements Comparable<CatalogDTO>{
     }
 
     public CatalogDTO(Long parentCatalogId, Catalog.Type type, Long id, Long dbId, File.BranchType branchType) {
+        super(id, type.getName());
+
         this.parentCatalogId = parentCatalogId;
         this.type = type;
-        this.name = type.getName();
         this.text = type.getName();
         this.level = type.getLevel();
         this.readOnly = type.isReadOnly();
-        this.id = id;
         this.realId = dbId;
         this.branchType = branchType;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Long getParentCatalogId() {
@@ -57,14 +46,6 @@ public class CatalogDTO implements Comparable<CatalogDTO>{
 
     public void setParentCatalogId(Long parentCatalogId) {
         this.parentCatalogId = parentCatalogId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public boolean isReadOnly() {
@@ -129,11 +110,6 @@ public class CatalogDTO implements Comparable<CatalogDTO>{
 
     public void setChildren(TreeSet<CatalogDTO> children) {
         this.children = children;
-    }
-
-    @Override
-    public int compareTo(@NotNull CatalogDTO that) {
-        return this.id.compareTo(that.id);
     }
 
     public Long getRealId() {

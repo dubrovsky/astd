@@ -3,70 +3,34 @@ package com.isc.astd.service.dto;
 /**
  * @author p.dzeviarylin
  */
-public class UserDTO {
+public class UserDTO extends UserBaseDTO {
 
-    private String id;
-    private String name;
-    private String positionName;
-    private int positionId;
-    private Long rootCatalogId;
-    private String organization;
+	private String positionName;
+	private String rootCatalogName;
 
-    public String getId() {
-        return id;
-    }
+	public String getPositionName() {
+		return positionName;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setPositionName(String positionName) {
+		this.positionName = positionName;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getRootCatalogName() {
+		return rootCatalogName;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setRootCatalogName(String rootCatalogName) {
+		this.rootCatalogName = rootCatalogName;
+	}
 
-    public String getPositionName() {
-        return positionName;
-    }
-
-    public void setPositionName(String position) {
-        this.positionName = position;
-    }
-
-    public String getOrganization() {
-        return organization;
-    }
-
-    public void setOrganization(String organization) {
-        this.organization = organization;
-    }
-
-    @Override
-    public String toString() {
-        return "UserDTO{" +
-          "id='" + id + '\'' +
-          ", name='" + name + '\'' +
-          ", positionName='" + positionName + '\'' +
-          ", organization='" + organization + '\'' +
-          '}';
-    }
-
-    public int getPositionId() {
-        return positionId;
-    }
-
-    public void setPositionId(int positionId) {
-        this.positionId = positionId;
-    }
-
-    public Long getRootCatalogId() {
-        return rootCatalogId;
-    }
-
-    public void setRootCatalogId(Long rootCatalogId) {
-        this.rootCatalogId = rootCatalogId;
-    }
+	@Override
+	public String toString() {
+		return "UserDTO{" +
+				"id='" + getId() + '\'' +
+				", name='" + getName() + '\'' +
+				", positionName='" + positionName + '\'' +
+				", organization='" + getOrganization() + '\'' +
+				'}';
+	}
 }

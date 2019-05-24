@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Collections;
 
 /**
@@ -26,7 +27,7 @@ public class DomainUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
         try {
             User user = userService.getUser(id);
-            if(user.getExpiredDate() != null) {
+            if(user.getExpiredDate() != null && user.getExpiredDate().isBefore(LocalDate.now())) {
                 throw new Exception("Доступ закрыт");
             }
             return new org.springframework.security.core.userdetails.User(user.getId(), "", Collections.singletonList(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN)));
