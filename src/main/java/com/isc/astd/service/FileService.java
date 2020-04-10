@@ -266,6 +266,11 @@ public class FileService {
     }
 
     @Transactional(readOnly = true)
+    public FileBaseDTO getFileDTO(long fileId) {
+        return mapper.map(getFile(fileId), FileBaseDTO.class);
+    }
+
+    @Transactional(readOnly = true)
     public FileViewDTO viewFile(long id) throws IOException {
         File file = getFile(id);
         FileViewDTO fileViewDTO = mapper.map(file, FileViewDTO.class);

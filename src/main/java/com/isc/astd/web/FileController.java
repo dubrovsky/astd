@@ -96,9 +96,9 @@ public class FileController {
     }
 
     @GetMapping("/check/ecp/{fileId}")
-    public ResponseEntity<Response<File>> checkFileAllEcps(@PathVariable("fileId") long fileId, @AuthenticationPrincipal User user) throws Exception {
+    public ResponseEntity<Response<FileBaseDTO>> checkFileAllEcps(@PathVariable("fileId") long fileId, @AuthenticationPrincipal User user) throws Exception {
         final boolean isValid = fileService.checkAllFileEcpsAndUpdate(fileId, user.getUsername(), null);
-        final File file = fileService.getFile(fileId);
+        final FileBaseDTO file = fileService.getFileDTO(fileId);
         return isValid ? ResponseEntity.ok().body(new Response<>(file)) : ResponseEntity.badRequest().body(new Response<>(file, "Подпись не верна", false, true));
     }
 
