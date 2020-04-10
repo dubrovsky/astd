@@ -55,7 +55,7 @@ public class FileController {
             throw new RuntimeException("Please select a file to upload");
         }
         FileDTO fileDTO;
-        if (dto.getId() == null && dto.getId() < 0) {
+        if (dto.getId() == null || dto.getId() < 0) {
             fileDTO = fileService.createFile(dto, principal);
         } else {
             if (dto.getStatus() == File.Status.APPROVED || dto.getStatus() == File.Status.REFERENCE || dto.getStatus() == File.Status.REJECTED) {
