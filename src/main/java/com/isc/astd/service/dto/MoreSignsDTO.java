@@ -20,7 +20,7 @@ public class MoreSignsDTO {
     private String stnLine;
     private final String num;
     @JsonFormat(pattern = "dd.MM.yyyy HH:mm:ss", timezone = "GMT+3")
-    private Instant dateShch;
+    private Instant dateSign;
 
     public MoreSignsDTO(long docId, long catalogId, long npp, String num, String descr,/* long signNum,*/ long fileId, String noteShl) {
         this.docId = docId;
@@ -30,7 +30,21 @@ public class MoreSignsDTO {
         this.descr = descr;
 //        this.signNum = signNum;
         this.fileId = fileId;
-	    this.noteShl = noteShl;
+        this.noteShl = noteShl;
+    }
+
+    public MoreSignsDTO(String shCh, Long catalogId, String stnLine, Long docId, Long npp, String num, String descr, Long fileId, Instant dateSign, Long signNum, String noteShl) {
+        this.shCh = shCh;
+        this.catalogId = catalogId;
+        this.stnLine = stnLine;
+        this.docId = docId;
+        this.npp = npp;
+        this.num = num;
+        this.descr = descr;
+        this.fileId = fileId;
+        this.dateSign = dateSign;
+        this.signNum = signNum;
+        this.noteShl = noteShl;
     }
 
     public Long getDocId() {
@@ -73,12 +87,12 @@ public class MoreSignsDTO {
         this.stnLine = stnLine;
     }
 
-    public Instant getDateShch() {
-        return dateShch;
+    public Instant getDateSign() {
+        return dateSign;
     }
 
-    public void setDateShch(Instant date) {
-        this.dateShch = date;
+    public void setDateSign(Instant date) {
+        this.dateSign = date;
     }
 
     public long getFileId() {
@@ -101,7 +115,7 @@ public class MoreSignsDTO {
         return 31;
     }
 
-	public String getNoteShl() {
-		return noteShl;
-	}
+    public String getNoteShl() {
+        return noteShl;
+    }
 }

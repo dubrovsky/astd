@@ -11,6 +11,7 @@ import com.isc.astd.service.dto.PageRequestDTO;
 import com.isc.astd.service.dto.PageableDTO;
 import com.isc.astd.service.dto.RejectFileDTO;
 import com.isc.astd.web.commons.Response;
+import com.isc.astd.web.errors.EcpException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.LocalDate;
@@ -42,24 +44,23 @@ public class FileController {
     }
 
     @GetMapping()
-    public ResponseEntity<Response<FileBaseDTO>> getAllFiles(@RequestParam long docId, File.BranchType branchType, PageableDTO pageableDTO, @AuthenticationPrincipal User principal) throws IOException {
+    public ResponseEntity<Response<FileBaseDTO>> getAllFiles(@RequestParam long docId, @RequestParam File.BranchType branchType, PageableDTO pageableDTO, @AuthenticationPrincipal User principal) throws IOException {
         PageRequestDTO<FileBaseDTO> fileDTOS = fileService.getAllFiles(docId, branchType, principal, pageableDTO);
         return ResponseEntity.ok(new Response<>(fileDTOS.getContent(), fileDTOS.getTotalElements()));
     }
 
     @PostMapping()
-    public ResponseEntity<Response<FileDTO>> saveFile(FileDTO dto, @AuthenticationPrincipal User principal) throws Exception {
+    public ResponseEntity<Response<FileDTO>> saveFile(@Valid FileDTO dto, @AuthenticationPrincipal User principal) throws Exception {
         if (dto.getFile().isEmpty()) {
             throw new RuntimeException("Please select a file to upload");
         }
         FileDTO fileDTO;
-        if(dto.getId() < 0){
+        if (dto.getId() == null && dto.getId() < 0) {
             fileDTO = fileService.createFile(dto, principal);
         } else {
-            if(dto.getStatus() == File.Status.APPROVED || dto.getStatus() == File.Status.REFERENCE || dto.getStatus() == File.Status.REJECTED) {
+            if (dto.getStatus() == File.Status.APPROVED || dto.getStatus() == File.Status.REFERENCE || dto.getStatus() == File.Status.REJECTED) {
                 fileDTO = fileService.newVersionFile(dto, principal);
-            }
-            else {
+            } else {
                 fileDTO = fileService.updateFile(dto, principal);
             }
         }
@@ -67,19 +68,38 @@ public class FileController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteFile(@PathVariable("id") long id, @AuthenticationPrincipal User principal) throws IOException {
-        fileService.deleteFile(id, principal);
+    public ResponseEntity deleteFile(@PathVariable("id") long id, @AuthenticationPrincipal User user) throws IOException {
+        fileService.deleteFile(id, user);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/view/{id}")
-    public ResponseEntity<byte[]> viewFile(@PathVariable("id") long id) throws IOException {
-        return getFileContent(id, "inline");
+    @DeleteMapping("/rejected/{id}")
+    public ResponseEntity deleteRejectedFile(@PathVariable("id") long id, @AuthenticationPrincipal User user) throws IOException {
+        fileService.deleteRejectedFile(id, user);
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/download/{id}")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable("id") long id) throws IOException {
-        return getFileContent(id, "attachment");
+    @GetMapping("/view/{fileId}")
+    public ResponseEntity<byte[]> viewFile(@PathVariable("fileId") long fileId, @AuthenticationPrincipal User user) throws Exception {
+        if (!fileService.checkAllFileEcpsAndUpdate(fileId, user.getUsername(), null)) {
+            throw new EcpException("Подпись не верна");
+        }
+        return getFileContent(fileId, "inline");
+    }
+
+    @GetMapping("/download/{fileId}")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable("fileId") long fileId, @AuthenticationPrincipal User user) throws Exception {
+        if (!fileService.checkAllFileEcpsAndUpdate(fileId, user.getUsername(), null)) {
+            throw new EcpException("Подпись не верна");
+        }
+        return getFileContent(fileId, "attachment");
+    }
+
+    @GetMapping("/check/ecp/{fileId}")
+    public ResponseEntity<Response<File>> checkFileAllEcps(@PathVariable("fileId") long fileId, @AuthenticationPrincipal User user) throws Exception {
+        final boolean isValid = fileService.checkAllFileEcpsAndUpdate(fileId, user.getUsername(), null);
+        final File file = fileService.getFile(fileId);
+        return isValid ? ResponseEntity.ok().body(new Response<>(file)) : ResponseEntity.badRequest().body(new Response<>(file, "Подпись не верна", false, true));
     }
 
     private ResponseEntity<byte[]> getFileContent(long id, String attachType) throws IOException {
@@ -94,7 +114,7 @@ public class FileController {
 
     @GetMapping("/ecp")
     public ResponseEntity<Response<EcpHashDTO>> getEcpData(@RequestParam("id") long fileId, @AuthenticationPrincipal User principal) throws Exception {
-        EcpHashDTO ecpDTO = fileService.getEcpData(fileId, principal);
+        EcpHashDTO ecpDTO = fileService.getEcpData(fileId, principal.getUsername());
         return ResponseEntity.ok(new Response<>(ecpDTO));
     }
 
@@ -105,25 +125,25 @@ public class FileController {
     }
 
     @PostMapping("/reject/{id}")
-    public ResponseEntity rejectFile(RejectFileDTO rejectFile, @PathVariable("id") long fileId, @AuthenticationPrincipal User principal) {
+    public ResponseEntity<?> rejectFile(RejectFileDTO rejectFile, @PathVariable("id") long fileId, @AuthenticationPrincipal User principal) {
         fileService.rejectFile(fileId, principal, rejectFile);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/reject/cancel/{id}")
-    public ResponseEntity rejectCancelFile(@PathVariable("id") long fileId, @AuthenticationPrincipal User principal) {
+    public ResponseEntity<?> rejectCancelFile(@PathVariable("id") long fileId, @AuthenticationPrincipal User principal) {
         fileService.rejectCancelFile(fileId, principal);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/archive/{id}")
-    public ResponseEntity archiveFile(@PathVariable("id") long fileId) throws Exception {
+    public ResponseEntity<?> archiveFile(@PathVariable("id") long fileId) throws Exception {
         fileService.archiveFile(fileId);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/archive/cancel/{id}")
-    public ResponseEntity archiveCancelFile(@PathVariable("id") long fileId) throws Exception {
+    public ResponseEntity<?> archiveCancelFile(@PathVariable("id") long fileId) throws Exception {
         fileService.archiveCancelFile(fileId);
         return ResponseEntity.ok().build();
     }
@@ -146,23 +166,23 @@ public class FileController {
         return ResponseEntity.ok(new Response<>());
     }
 
-	@PostMapping("/originalchecked/{id}")
-	public ResponseEntity<Response> saveOriginalChecked(@PathVariable("id") long fileId,
-	                                                                @RequestParam("fioSign1") String fioSign1, @RequestParam("fioSign2") String fioSign2,
-	                                                                @RequestParam("dateSign1") LocalDate dateSign1, @RequestParam("dateSign2") LocalDate dateSign2) {
-		fileService.saveOriginalChecked(fileId, fioSign1, fioSign2, dateSign1, dateSign2);
-		return ResponseEntity.ok(new Response<>());
-	}
+    @PostMapping("/originalchecked/{id}")
+    public ResponseEntity<Response> saveOriginalChecked(@PathVariable("id") long fileId,
+                                                        @RequestParam("fioSign1") String fioSign1, @RequestParam("fioSign2") String fioSign2,
+                                                        @RequestParam("dateSign1") LocalDate dateSign1, @RequestParam("dateSign2") LocalDate dateSign2) {
+        fileService.saveOriginalChecked(fileId, fioSign1, fioSign2, dateSign1, dateSign2);
+        return ResponseEntity.ok(new Response<>());
+    }
 
-	@PostMapping("/theme/{id}")
-	public ResponseEntity<Response> saveTheme(@PathVariable("id") long fileId, @RequestParam("theme") String theme) {
-		fileService.saveTheme(fileId, theme);
-		return ResponseEntity.ok(new Response<>());
-	}
+    @PostMapping("/theme/{id}")
+    public ResponseEntity<Response> saveTheme(@PathVariable("id") long fileId, @RequestParam("theme") String theme) {
+        fileService.saveTheme(fileId, theme);
+        return ResponseEntity.ok(new Response<>());
+    }
 
-	@PostMapping("/note/{id}")
-	public ResponseEntity<Response> saveNote(@PathVariable("id") long fileId, @RequestParam("note") String note) {
-		fileService.saveNote(fileId, note);
-		return ResponseEntity.ok(new Response<>());
-	}
+    @PostMapping("/note/{id}")
+    public ResponseEntity<Response> saveNote(@PathVariable("id") long fileId, @RequestParam("note") String note) {
+        fileService.saveNote(fileId, note);
+        return ResponseEntity.ok(new Response<>());
+    }
 }

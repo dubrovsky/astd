@@ -47,7 +47,9 @@ public class RoutePosition {
         COORDINATE("coordinate", "Согласовал"),
         APPROVE("approve", "Проверил"),
 	    REFERENCE("reference", "Для справки"),
-	    ASSURE("assure", "Заверил");
+	    ASSURE("assure", "Заверил"),
+        ASSEMBLE("assemble", "Скомплектовал"),
+        ACCEPT("accept", "Принял");
 
         private final String code;
         private final String text;

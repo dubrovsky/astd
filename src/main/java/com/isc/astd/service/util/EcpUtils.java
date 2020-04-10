@@ -5,7 +5,8 @@ import by.avest.crypto.pkcs.pkcs7.SignerInfo;
 import by.avest.crypto.util.ByteArrayUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 import sun.security.util.DerValue;
@@ -26,7 +27,7 @@ import java.security.cert.X509Certificate;
  * Created by LAN on 03.10.2014.
  */
 public class EcpUtils {
-    private static final Logger log = Logger.getLogger(EcpUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(EcpUtils.class);
 
     public static String getHash(byte[] src, String algorithm) throws Exception {
         MessageDigest md = MessageDigest.getInstance(algorithm);

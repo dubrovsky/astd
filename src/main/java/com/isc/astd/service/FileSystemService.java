@@ -40,8 +40,8 @@ public class FileSystemService {
         Files.deleteIfExists(path);
     }
 
-    public byte[] readFile(File file, Doc doc) throws IOException {
-        Path path = getFilePath(file.getName(), file.getId(), doc);
+    public byte[] readFile(File file) throws IOException {
+        Path path = getFilePath(file.getName(), file.getId(), file.getDoc());
         return Files.readAllBytes(path);
     }
 

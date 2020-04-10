@@ -1,6 +1,7 @@
 package com.isc.astd.service.dto;
 
 import com.isc.astd.domain.Position;
+import com.isc.astd.domain.RoutePosition;
 
 import java.util.Objects;
 
@@ -12,6 +13,7 @@ public class SignedPositionDTO {
     private Position position;
     private int order;
     private String createdBy;
+    private RoutePosition.Status routePositionStatus;
 
     public SignedPositionDTO(Position position, int order, String createdBy) {
         this.position = position;
@@ -19,9 +21,10 @@ public class SignedPositionDTO {
         this.createdBy = createdBy;
     }
 
-    public SignedPositionDTO(Position position, int order) {
+    public SignedPositionDTO(Position position, int order, RoutePosition.Status routePositionStatus) {
         this.position = position;
         this.order = order;
+        this.routePositionStatus = routePositionStatus;
     }
 
     public Position getPosition() {
@@ -49,5 +52,9 @@ public class SignedPositionDTO {
 
     public String getCreatedBy() {
         return createdBy;
+    }
+
+    public RoutePosition.Status getRoutePositionStatus() {
+        return routePositionStatus;
     }
 }

@@ -2,15 +2,14 @@ package com.isc.astd.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.isc.astd.domain.File;
+import com.isc.astd.web.validator.FileListNumConstraint;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author p.dzeviarylin
- */
+@FileListNumConstraint
 public class FileBaseDTO {
 
     private Long id;

@@ -171,3 +171,7 @@ h3>label {
     font: 23px/0.8 FontAwesome;
     color: #005b8f;
 }
+.more-list-view {
+    border: 3px outset #333399;
+    z-index: 100;
+}

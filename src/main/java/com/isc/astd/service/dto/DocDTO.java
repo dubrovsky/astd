@@ -12,6 +12,7 @@ public class DocDTO {
     private Long npp;
     private String num;
     private String descr;
+    private String noteShl;
     private int filesNum = 0;
     private int signNum = 0;
     private File.BranchType branchType = File.BranchType.DEFAULT;
@@ -125,5 +126,13 @@ public class DocDTO {
 
     public void setRootCatalogId(Long rootCatalogId) {
         this.rootCatalogId = rootCatalogId;
+    }
+
+    public String getNoteShl() {
+        return noteShl;
+    }
+
+    public void setNoteShl(String noteShl) {
+        this.noteShl = noteShl;
     }
 }

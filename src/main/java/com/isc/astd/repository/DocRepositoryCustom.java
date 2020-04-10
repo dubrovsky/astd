@@ -1,15 +1,16 @@
 package com.isc.astd.repository;
 
-import com.isc.astd.service.dto.MoreRejectedDTO;
-import com.isc.astd.service.dto.MoreSignsDTO;
-
-import java.util.List;
+import org.springframework.data.domain.Sort;
 
 /**
  * @author p.dzeviarylin
  */
 public interface DocRepositoryCustom {
-	List<MoreSignsDTO> findDocsWithFilesToSign(long nextSignPositionId, String userId, Long rootCatalogId);
+	<T> T findDocsWithRejectedFiles(Long positionId, Long rootCatalogId, int start, int limit, Sort sort, boolean isCount);
 
-	List<MoreRejectedDTO> findDocsWithRejectedFiles(String userId, Long positionId, Long rootCatalogId);
+	<T> T findDocsWithApprovedFiles(Long rootCatalogId, Integer start, Integer limit, Sort sort, boolean isCount);
+
+	<T> T findDocsWithFilesToSign(Long nextSignPositionId, Long rootCatalogId, Integer start, Integer limit, Sort sort, boolean isCount);
+
+	<T> T findDocsWithFilesAssureToSign(Long nextSignPositionId, Long rootCatalogId, Integer start, Integer limit, Sort sort, boolean isCount);
 }

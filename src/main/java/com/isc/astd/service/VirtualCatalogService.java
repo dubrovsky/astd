@@ -45,18 +45,18 @@ public class VirtualCatalogService {
 
     List<CatalogDTO> addVirtualCatalogsToCatalog(Catalog catalog, Catalog parentCatalog) {
         CatalogDTO catalogDTO = mapper.map(catalog, CatalogDTO.class);
-        CatalogDTO parentCatalogDTO = mapper.map(parentCatalog, CatalogDTO.class);
-        List<CatalogDTO> catalogDTOS = new ArrayList<>(3);
+//        CatalogDTO parentCatalogDTO = mapper.map(parentCatalog, CatalogDTO.class);
+        List<CatalogDTO> catalogDTOS = new ArrayList<>(1);
         catalogDTOS.add(catalogDTO);
-        catalogDTOS.addAll(createVirtualCatalogs(catalog, parentCatalogDTO));
+//        catalogDTOS.addAll(createVirtualCatalogs(catalog, parentCatalogDTO));
         return catalogDTOS;
     }
 
-    private List<CatalogDTO> createVirtualCatalogs(Catalog catalog, CatalogDTO parentCatalogDTO) {
+    /*private List<CatalogDTO> createVirtualCatalogs(Catalog catalog, CatalogDTO parentCatalogDTO) {
         CatalogDTO archiveCatalogDTO = mapper.map(catalog, CatalogDTO.class);
         updateVirtualCatalog(parentCatalogDTO, archiveCatalogDTO, Catalog.Type.ARCHIVE, File.BranchType.ARCHIVE, false);
         CatalogDTO rejectedCatalogDTO = mapper.map(catalog, CatalogDTO.class);
         updateVirtualCatalog(parentCatalogDTO, rejectedCatalogDTO, Catalog.Type.REJECTED, File.BranchType.REJECTED, false);
         return Arrays.asList(archiveCatalogDTO, rejectedCatalogDTO);
-    }
+    }*/
 }

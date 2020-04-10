@@ -53,6 +53,12 @@ public class CatalogService {
             catalogDTOS = mapper.mapAsList(catalogRepository.findAllByType(Catalog.Type.ROOT), CatalogDTO.class);
         }
 
+        /*catalogDTOS.forEach(shch -> {
+            CatalogDTO stationOrLine = shch.getChildren().iterator().next();
+            stationOrLine.getChildren().stream().sorted(Co);
+            stationOrLine = shch.getChildren().iterator().next();
+        });*/
+
 /*
         catalogDTOS.forEach(catalogDTO0 -> catalogDTO0.getChildren().forEach(catalogDTO1 -> {
             CatalogDTO archiveCatalog = virtualCatalogService.addVirtualCatalog(catalogDTO1, Catalog.Type.ARCHIVE, File.BranchType.ARCHIVE);

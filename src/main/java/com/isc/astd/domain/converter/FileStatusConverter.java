@@ -10,17 +10,20 @@ import javax.persistence.AttributeConverter;
 public class FileStatusConverter implements AttributeConverter<File.Status, String> {
     @Override
     public String convertToDatabaseColumn(File.Status attribute) {
-        return attribute.getCode();
+        return attribute != null ? attribute.getCode() : null;
     }
 
     @Override
     public File.Status convertToEntityAttribute(String dbData) {
-        for (File.Status status : File.Status.values()) {
-            if (status.getCode().equals(dbData)) {
-                return status;
+        if (dbData != null) {
+            for (File.Status status : File.Status.values()) {
+                if (status.getCode().equals(dbData)) {
+                    return status;
+                }
             }
+            throw new IllegalArgumentException("Unknown database value:" + dbData);
         }
 
-        throw new IllegalArgumentException("Unknown database value:" + dbData);
+        return null;
     }
 }

@@ -1,9 +1,13 @@
 package com.isc.astd.service;
 
-import com.isc.astd.domain.*;
+import com.isc.astd.domain.Audit;
+import com.isc.astd.domain.Catalog;
+import com.isc.astd.domain.Doc;
+import com.isc.astd.domain.File;
 import com.isc.astd.repository.DocRepository;
 import com.isc.astd.repository.specification.DocSpecification;
 import com.isc.astd.service.dto.DocDTO;
+import com.isc.astd.service.dto.MoreApprovedDTO;
 import com.isc.astd.service.dto.MoreRejectedDTO;
 import com.isc.astd.service.dto.MoreSignsDTO;
 import com.isc.astd.service.dto.PageRequestDTO;
@@ -12,16 +16,15 @@ import com.isc.astd.service.mapper.Mapper;
 import com.isc.astd.service.util.Utils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.time.Instant;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author p.dzeviarylin
@@ -62,7 +65,7 @@ public class DocService {
 //        List<Doc> docs = docRepository.findAllByCatalogId(catalogId);
         Page<Doc> docs = docRepository.findAll(
                 DocSpecification.byCatalogIdAndBranchType(catalogId, branchType),
-                PageRequest.of(pageableDTO.getPage() - 1, pageableDTO.getLimit(), utils.getSort(pageableDTO))
+                PageRequest.of(pageableDTO.getPage() - 1, pageableDTO.getLimit(), utils.getSort(pageableDTO, "npp", null))
         );
         List<DocDTO> docDTOs = new ArrayList<>(docs.getContent().size());
         docs.forEach(doc -> {
@@ -80,7 +83,7 @@ public class DocService {
         );
         docDTO.setSignNum(
                 Math.toIntExact(doc.getFiles().stream().
-                        filter(file -> fileEcpService.isMyOrderToSign(file, user)).
+                        filter(file -> file.getBranchType() == File.BranchType.DEFAULT && fileEcpService.isMyOrderToSign(file, user)).
                         count())
         );
         docDTO.setBranchType(branchType);
@@ -136,81 +139,96 @@ public class DocService {
 
 
     @Transactional(readOnly = true)
-    List<MoreSignsDTO> getMoreSigns(com.isc.astd.domain.User user) {
-        List<MoreSignsDTO> moreSignsDTOS = docRepository.findDocsWithFilesToSign(
+    public PageRequestDTO<MoreSignsDTO> getMoreSigns(PageableDTO pageableDTO, com.isc.astd.domain.User user) throws IOException {
+        final List<MoreSignsDTO> docs = docRepository.findDocsWithFilesToSign(
                 user.getPosition().getId(),
-                user.getId(),
-                user.getRootCatalog() != null ? user.getRootCatalog().getId() : null
+                user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
+                pageableDTO.getStart(),
+                pageableDTO.getLimit(),
+                utils.getSort(pageableDTO, "dateSign", Sort.Direction.ASC),
+                false
         );
 
-        final Map<Long, List<MoreSignsDTO>> docsById = moreSignsDTOS.stream().collect(Collectors.groupingBy(MoreSignsDTO::getDocId));
+        final BigInteger total = docRepository.findDocsWithFilesToSign(
+                user.getPosition().getId(),
+                user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
+                null,
+                null,
+                null,
+                true
+        );
 
-        List<MoreSignsDTO> result = new ArrayList<>(docsById.size());
-        docsById.values().forEach(docs -> docs.forEach(moreSignsDTO -> {
-            if(!result.contains(moreSignsDTO)) {
-                Catalog catalog = catalogService.getCatalog(moreSignsDTO.getCatalogId());
-                moreSignsDTO.setStnLine(catalog.getName());
-                moreSignsDTO.setShCh(catalogService.getRootCatalog(catalog).getName());
-                moreSignsDTO.setSignNum(docs.size());
-
-                final List<FilePosition> filePositions =
-                        docs.stream().
-                                filter(moreSignsDTO1 ->
-                                    fileEcpService.isSignedBy(positionService.getPosition(6), fileService.getFile(moreSignsDTO1.getFileId()))
-                                ).
-                                map(
-                                    moreSignsDTO1 -> fileEcpService.getSignatureFor(positionService.getPosition(6), fileService.getFile(moreSignsDTO1.getFileId()))
-                                ).
-                                collect(Collectors.toList());
-
-                moreSignsDTO.setDateShch(filePositions.stream().map(AbstractAuditingEntity::getCreatedDate).min(Instant::compareTo).orElse(null));
-
-                result.add(moreSignsDTO);
-            }
-        }));
-
-        return result;
+        return new PageRequestDTO<>(total.longValue(), docs);
     }
 
-	@Transactional(readOnly = true)
-	List<MoreRejectedDTO> getMoreRejected(com.isc.astd.domain.User user) {
-		List<MoreRejectedDTO> moreRejectedDTOS = docRepository.findDocsWithRejectedFiles(
-				user.getId(),
-				user.getPosition().getId(),
-				user.getRootCatalog() != null ? user.getRootCatalog().getId() : null
-		);
+    public PageRequestDTO<MoreSignsDTO> getMoreSignsAssure(PageableDTO pageableDTO, com.isc.astd.domain.User user) throws IOException {
+        final List<MoreSignsDTO> docs = docRepository.findDocsWithFilesAssureToSign(
+                user.getPosition().getId(),
+                user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
+                pageableDTO.getStart(),
+                pageableDTO.getLimit(),
+                utils.getSort(pageableDTO, "dateSign", Sort.Direction.ASC),
+                false
+        );
 
-		final Map<Long, List<MoreRejectedDTO>> docsById = moreRejectedDTOS.stream().collect(Collectors.groupingBy(MoreRejectedDTO::getDocId));
+        final BigInteger total = docRepository.findDocsWithFilesAssureToSign(
+                user.getPosition().getId(),
+                user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
+                pageableDTO.getStart(),
+                pageableDTO.getLimit(),
+                utils.getSort(pageableDTO, "dateSign", Sort.Direction.DESC),
+                true
+        );
 
-		List<MoreRejectedDTO> result = new ArrayList<>(docsById.size());
-		docsById.values().forEach(docs -> docs.forEach(moreRejectedDTO -> {
-			if(!result.contains(moreRejectedDTO)) {
-				Catalog catalog = catalogService.getCatalog(moreRejectedDTO.getCatalogId());
-				moreRejectedDTO.setStnLine(catalog.getName());
-				moreRejectedDTO.setShCh(catalogService.getRootCatalog(catalog).getName());
-				moreRejectedDTO.setSignNum(docs.size());
+        return new PageRequestDTO<>(total.longValue(), docs);
+    }
 
-				final List<FilePosition> filePositions =
-						docs.stream().
-								filter(moreSignsDTO1 ->
-										fileEcpService.isSignedBy(positionService.getPosition(6), fileService.getFile(moreSignsDTO1.getFileId()))
-								).
-								map(
-										moreSignsDTO1 -> fileEcpService.getSignatureFor(positionService.getPosition(6), fileService.getFile(moreSignsDTO1.getFileId()))
-								).
-								collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public PageRequestDTO<MoreRejectedDTO> getMoreRejected(PageableDTO pageableDTO, com.isc.astd.domain.User user) throws IOException {
+        final List<MoreRejectedDTO> docs = docRepository.findDocsWithRejectedFiles(
+                user.getPosition().getId(),
+                user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
+                pageableDTO.getStart(),
+                pageableDTO.getLimit(),
+                utils.getSort(pageableDTO, "dateSign", Sort.Direction.DESC),
+                false
+        );
 
-				moreRejectedDTO.setDateShch(filePositions.stream().map(AbstractAuditingEntity::getCreatedDate).min(Instant::compareTo).orElse(null));
+        final BigInteger total = docRepository.findDocsWithRejectedFiles(
+                user.getPosition().getId(),
+                user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
+                pageableDTO.getStart(),
+                pageableDTO.getLimit(),
+                utils.getSort(pageableDTO, "dateSign", Sort.Direction.DESC),
+                true
+        );
 
-				result.add(moreRejectedDTO);
-			}
-		}));
+        return new PageRequestDTO<>(total.longValue(), docs);
+    }
 
-		return result;
-	}
+    @Transactional(readOnly = true)
+    public PageRequestDTO<MoreApprovedDTO> getMoreApproved(PageableDTO pageableDTO, com.isc.astd.domain.User user) throws IOException {
+        final List<MoreApprovedDTO> docs = docRepository.findDocsWithApprovedFiles(
+                user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
+                pageableDTO.getStart(),
+                pageableDTO.getLimit(),
+                utils.getSort(pageableDTO, "dateSign", Sort.Direction.DESC),
+                false
+        );
+
+        final BigInteger total = docRepository.findDocsWithApprovedFiles(
+                user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
+                pageableDTO.getStart(),
+                pageableDTO.getLimit(),
+                utils.getSort(pageableDTO, "dateSign", Sort.Direction.DESC),
+                true
+        );
+
+        return new PageRequestDTO<>(total.longValue(), docs);
+    }
 
     public DocDTO getDocById(long docId, User principal, File.BranchType branchType) {
         Doc doc = getDoc(docId);
-	    return getDoc(branchType, principal, doc);
+        return getDoc(branchType, principal, doc);
     }
 }

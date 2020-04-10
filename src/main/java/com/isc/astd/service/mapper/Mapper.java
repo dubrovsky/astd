@@ -77,6 +77,7 @@ public class Mapper extends ConfigurableMapper {
 			    .fieldAToB("position.id", "positionId")
 			    .fieldAToB("rootCatalog.id", "rootCatalogId")
 			    .fieldAToB("id", "prevId")
+			    .fieldAToB("expiredDate", "expiredDate")
 			    .field("id", "id")
 			    .byDefault()
 			    .register();

@@ -35,4 +35,6 @@ public interface DocRepository extends JpaRepository<Doc, Long>, JpaSpecificatio
             "  GROUP BY d.id"
     )
     Collection<DocDTO> findDocsWithFilesToSign(@Param("nextSignPositionId") String nextSignPositionId, @Param("userId") long userId);
+
+    long countAllByCreatedByEqualsOrLastModifiedByEquals(String user1, String user2);
 }

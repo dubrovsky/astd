@@ -126,7 +126,7 @@ public class AuditService {
 
     public PageRequestDTO<AuditDTO> getAllEntities(User user, PageableDTO pageableDTO) {
         Page<Audit> entityAudits = entityAuditRepository.findAll(
-                PageRequest.of(pageableDTO.getPage() - 1, pageableDTO.getLimit(), new Sort(Sort.Direction.DESC, "id"))
+                PageRequest.of(pageableDTO.getPage() - 1, pageableDTO.getLimit(), Sort.by(Sort.Direction.DESC, "id"))
         );
         List<AuditDTO> auditDTOs = new ArrayList<>(entityAudits.getContent().size());
         entityAudits.forEach(entityAudit -> {

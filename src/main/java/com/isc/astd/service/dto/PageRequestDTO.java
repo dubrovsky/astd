@@ -7,14 +7,18 @@ import java.util.List;
  */
 public class PageRequestDTO<T> {
 
-    private final int totalPages;
+    private final Integer totalPages;
     private final long totalElements;
     private final List<T> content;
 
-    public PageRequestDTO(int totalPages, long totalElements, List<T> content) {
+    public PageRequestDTO(Integer totalPages, long totalElements, List<T> content) {
         this.totalPages = totalPages;
         this.totalElements = totalElements;
         this.content = content;
+    }
+
+    public PageRequestDTO(long totalElements, List<T> content) {
+        this(null, totalElements, content);
     }
 
     public int getTotalPages() {

@@ -19,8 +19,10 @@
      */
     "frameworks": {        "ext": {
             "path":"ext",
-            "version":"6.7.0.210"
+            "version":"7.2.0.67"
         }
+        
+        
         
         
         

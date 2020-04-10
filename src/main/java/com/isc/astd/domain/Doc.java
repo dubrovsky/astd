@@ -1,11 +1,16 @@
 package com.isc.astd.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
-import com.isc.astd.service.json.Views;
 import org.hibernate.annotations.BatchSize;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.HashSet;
@@ -18,12 +23,10 @@ import java.util.Set;
 @Table(name = "doc")
 public class Doc extends AbstractBaseEntity {
 
-    @JsonView(Views.Default.class)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "catalog_id")
     private Catalog catalog;
 
-    @JsonView(Views.Default.class)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "root_cat_id")
     private Catalog rootCatalog;
@@ -39,6 +42,10 @@ public class Doc extends AbstractBaseEntity {
     @Size(max = 512)
     @Column(name = "descr", length = 512)
     private String descr;
+
+    @Size(max = 512)
+    @Column(name = "note_shl", length = 512)
+    private String noteShl;
 
     @NotNull
     @Column(name = "read_only", nullable = false)
@@ -146,5 +153,13 @@ public class Doc extends AbstractBaseEntity {
 
     public void setRootCatalog(Catalog rootCatalog) {
         this.rootCatalog = rootCatalog;
+    }
+
+    public String getNoteShl() {
+        return noteShl;
+    }
+
+    public void setNoteShl(String noteShl) {
+        this.noteShl = noteShl;
     }
 }

@@ -1,12 +1,15 @@
 package com.isc.astd.service;
 
+import com.isc.astd.service.dto.MoreApprovedDTO;
 import com.isc.astd.service.dto.MoreRejectedDTO;
 import com.isc.astd.service.dto.MoreSignsDTO;
+import com.isc.astd.service.dto.PageRequestDTO;
+import com.isc.astd.service.dto.PageableDTO;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.io.IOException;
 
 /**
  * @author p.dzeviarylin
@@ -24,12 +27,20 @@ public class MainService {
         this.userService = userService;
     }
 
-    public List<MoreSignsDTO> getMoreSigns(User user){
-        return docService.getMoreSigns(userService.getUser(user.getUsername()));
+    public PageRequestDTO<MoreSignsDTO> getMoreSigns(PageableDTO pageableDTO, User user) throws IOException {
+        return docService.getMoreSigns(pageableDTO, userService.getUser(user.getUsername()));
     }
 
-	public List<MoreRejectedDTO> getMoreRejected(User user){
-		return docService.getMoreRejected(userService.getUser(user.getUsername()));
-	}
+    public PageRequestDTO<MoreSignsDTO> getMoreSignsAssure(PageableDTO pageableDTO, User user) throws IOException {
+        return docService.getMoreSignsAssure(pageableDTO, userService.getUser(user.getUsername()));
+    }
+
+    public PageRequestDTO<MoreRejectedDTO> getMoreRejected(PageableDTO pageableDTO, User user) throws IOException {
+        return docService.getMoreRejected(pageableDTO, userService.getUser(user.getUsername()));
+    }
+
+    public PageRequestDTO<MoreApprovedDTO> getMoreApproved(PageableDTO pageableDTO, User user) throws IOException {
+        return docService.getMoreApproved(pageableDTO, userService.getUser(user.getUsername()));
+    }
 
 }

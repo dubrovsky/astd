@@ -1,12 +1,18 @@
 package com.isc.astd.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
 import com.isc.astd.domain.converter.CatalogTypeConverter;
-import com.isc.astd.service.json.Views;
 import org.hibernate.annotations.BatchSize;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -21,7 +27,6 @@ import java.util.Set;
 @Table(name = "catalog")
 public class Catalog extends AbstractBaseEntity {
 
-    @JsonView(Views.Default.class)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_catalog_id")
     private Catalog parentCatalog;

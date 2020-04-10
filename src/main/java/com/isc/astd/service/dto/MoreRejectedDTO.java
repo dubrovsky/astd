@@ -15,23 +15,29 @@ public class MoreRejectedDTO {
 	private final long npp;
 	private final String descr;
 	private final String noteShl;
-	private long signNum;
-	private String shCh;
-	private String stnLine;
+	private final long listCount;
+	private final String shCh;
+	private final String stnLine;
 	private final String num;
+	private final String msg;
 	@JsonFormat(pattern = "dd.MM.yyyy HH:mm:ss", timezone = "GMT+3")
-	private Instant dateShch;
+	private final Instant dateSign;
 
-	public MoreRejectedDTO(long docId, long catalogId, long npp, String num, String descr,/* long signNum,*/ long fileId, String noteShl) {
+	public MoreRejectedDTO(String shCh, long catalogId, String stnLine, Long docId, long npp, String num, String descr, long fileId, Instant dateSign, long listCount, String noteShl, String msg) {
 		this.docId = docId;
 		this.catalogId = catalogId;
-		this.npp = npp;
-		this.num = num;
-		this.descr = descr;
-//        this.signNum = signNum;
 		this.fileId = fileId;
+		this.npp = npp;
+		this.descr = descr;
 		this.noteShl = noteShl;
+		this.listCount = listCount;
+		this.shCh = shCh;
+		this.stnLine = stnLine;
+		this.num = num;
+		this.msg = msg;
+		this.dateSign = dateSign;
 	}
+
 
 	public Long getDocId() {
 		return docId;
@@ -49,8 +55,8 @@ public class MoreRejectedDTO {
 		return descr;
 	}
 
-	public long getSignNum() {
-		return signNum;
+	public long getListCount() {
+		return listCount;
 	}
 
 	public String getNum() {
@@ -61,32 +67,16 @@ public class MoreRejectedDTO {
 		return shCh;
 	}
 
-	public void setShCh(String shCh) {
-		this.shCh = shCh;
-	}
-
 	public String getStnLine() {
 		return stnLine;
 	}
 
-	public void setStnLine(String stnLine) {
-		this.stnLine = stnLine;
-	}
-
-	public Instant getDateShch() {
-		return dateShch;
-	}
-
-	public void setDateShch(Instant date) {
-		this.dateShch = date;
+	public Instant getDateSign() {
+		return dateSign;
 	}
 
 	public long getFileId() {
 		return fileId;
-	}
-
-	public void setSignNum(long signNum) {
-		this.signNum = signNum;
 	}
 
 	@Override
@@ -103,5 +93,9 @@ public class MoreRejectedDTO {
 
 	public String getNoteShl() {
 		return noteShl;
+	}
+
+	public String getMsg() {
+		return msg;
 	}
 }

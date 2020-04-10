@@ -1,10 +1,8 @@
 package com.isc.astd.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
 import com.isc.astd.domain.converter.BranchTypeConverter;
 import com.isc.astd.domain.converter.FileStatusConverter;
-import com.isc.astd.service.json.Views;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.CascadeType;
@@ -32,17 +30,14 @@ import java.util.Set;
 @Table(name = "file")
 public class File extends AbstractBaseEntity {
 
-    @JsonView(Views.Default.class)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doc_id")
     private Doc doc;
 
-    @JsonView(Views.Default.class)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "route_id")
     private Route route;
 
-    @JsonView(Views.Default.class)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "next_sign_position_id")
     private Position nextSignPosition;
@@ -66,13 +61,13 @@ public class File extends AbstractBaseEntity {
     @Column(name = "note_shl", length = 512)
     private String noteShl;
 
-	@Size(max = 512)
-	@Column(name = "theme_shchtd", length = 512)
-	private String themeShchtd;
+    @Size(max = 512)
+    @Column(name = "theme_shchtd", length = 512)
+    private String themeShchtd;
 
-	@Size(max = 512)
-	@Column(name = "descr", length = 512)
-	private String descr;
+    @Size(max = 512)
+    @Column(name = "descr", length = 512)
+    private String descr;
 
     @NotNull
     @Size(min = 1, max = 128)
@@ -111,6 +106,10 @@ public class File extends AbstractBaseEntity {
     @Column(name = "status", nullable = false)
     private Status status = Status.DEFAULT;
 
+    @Convert(converter = FileStatusConverter.class)
+    @Column(name = "status_prev")
+    private Status statusPrev;
+
     @Size(max = 32)
     @Column(name = "status_modified_by", length = 32)
     private String statusModifiedBy;
@@ -120,19 +119,19 @@ public class File extends AbstractBaseEntity {
     @Column(name = "branch_type", nullable = false)
     private BranchType branchType = BranchType.DEFAULT;
 
-	@Size(max = 32)
-	@Column(name = "fio_sign_1", length = 32)
-	private String fioSign1;
+    @Size(max = 32)
+    @Column(name = "fio_sign_1", length = 32)
+    private String fioSign1;
 
-	@Size(max = 32)
-	@Column(name = "fio_sign_2", length = 32)
-	private String fioSign2;
+    @Size(max = 32)
+    @Column(name = "fio_sign_2", length = 32)
+    private String fioSign2;
 
-	@Column(name = "date_sign_1")
-	private LocalDate dateSign1;
+    @Column(name = "date_sign_1")
+    private LocalDate dateSign1;
 
-	@Column(name = "date_sign_2")
-	private LocalDate dateSign2;
+    @Column(name = "date_sign_2")
+    private LocalDate dateSign2;
 
     public String getName() {
         return name;
@@ -225,6 +224,10 @@ public class File extends AbstractBaseEntity {
         return status;
     }
 
+    public String getStatusText() {
+        return status.getText();
+    }
+
     public void setStatus(Status status) {
         this.status = status;
     }
@@ -277,68 +280,75 @@ public class File extends AbstractBaseEntity {
         this.nextSignPosition = nextSignPosition;
     }
 
-	public String getFioSign1() {
-		return fioSign1;
-	}
+    public String getFioSign1() {
+        return fioSign1;
+    }
 
-	public void setFioSign1(String fioSign1) {
-		this.fioSign1 = fioSign1;
-	}
+    public void setFioSign1(String fioSign1) {
+        this.fioSign1 = fioSign1;
+    }
 
-	public String getFioSign2() {
-		return fioSign2;
-	}
+    public String getFioSign2() {
+        return fioSign2;
+    }
 
-	public void setFioSign2(String fioSign2) {
-		this.fioSign2 = fioSign2;
-	}
+    public void setFioSign2(String fioSign2) {
+        this.fioSign2 = fioSign2;
+    }
 
-	public LocalDate getDateSign1() {
-		return dateSign1;
-	}
+    public LocalDate getDateSign1() {
+        return dateSign1;
+    }
 
-	public void setDateSign1(LocalDate dateSign1) {
-		this.dateSign1 = dateSign1;
-	}
+    public void setDateSign1(LocalDate dateSign1) {
+        this.dateSign1 = dateSign1;
+    }
 
-	public LocalDate getDateSign2() {
-		return dateSign2;
-	}
+    public LocalDate getDateSign2() {
+        return dateSign2;
+    }
 
-	public void setDateSign2(LocalDate dateSign2) {
-		this.dateSign2 = dateSign2;
-	}
+    public void setDateSign2(LocalDate dateSign2) {
+        this.dateSign2 = dateSign2;
+    }
 
-	public String getNoteShl() {
-		return noteShl;
-	}
+    public String getNoteShl() {
+        return noteShl;
+    }
 
-	public void setNoteShl(String noteShl) {
-		this.noteShl = noteShl;
-	}
+    public void setNoteShl(String noteShl) {
+        this.noteShl = noteShl;
+    }
 
-	public String getThemeShchtd() {
-		return themeShchtd;
-	}
+    public String getThemeShchtd() {
+        return themeShchtd;
+    }
 
-	public void setThemeShchtd(String themeShchtd) {
-		this.themeShchtd = themeShchtd;
-	}
+    public void setThemeShchtd(String themeShchtd) {
+        this.themeShchtd = themeShchtd;
+    }
+
+    public Status getStatusPrev() {
+        return statusPrev;
+    }
+
+    public void setStatusPrev(Status statusPrev) {
+        this.statusPrev = statusPrev;
+    }
 
    /* public void removeFilePosition(FilePosition filePosition) {
         filePositions.remove(filePosition);
 //        filePosition.getId().setFile(null);
     }*/
 
-    public enum Status{
+    public enum Status {
         DEFAULT("default", "Загружен"),
         REJECTED("rejected", "Отклонено"),
         SIGNING("signing", "На согласовании"),
         APPROVED("approved", "Утверждено"),
         DAMAGED("damaged", "Повреждён"),
         INVALID("invalid", "Недействительный"),
-	    REFERENCE("reference", "Для справки")
-        ;
+        REFERENCE("reference", "Для справки");
 
         private final String code;
         private final String text;
@@ -357,12 +367,11 @@ public class File extends AbstractBaseEntity {
         }
     }
 
-    public enum BranchType{
+    public enum BranchType {
         DEFAULT("default", "В работе"),
         APPROVED("approved", "Утверждено"),
         REJECTED("rejected", "Отклонено"),
-        ARCHIVE("archive", "Архив")
-        ;
+        ARCHIVE("archive", "Архив");
 
         private final String code;
         private final String text;
@@ -384,10 +393,10 @@ public class File extends AbstractBaseEntity {
     @Override
     public String toString() {
         return "File{" +
-          "name='" + name + '\'' +
-          ", id=" + getId() +
-          ", listNum='" + listNum + '\'' +
-          ", descr='" + descr + '\'' +
-          '}';
+                "name='" + name + '\'' +
+                ", id=" + getId() +
+                ", listNum='" + listNum + '\'' +
+                ", descr='" + descr + '\'' +
+                '}';
     }
 }

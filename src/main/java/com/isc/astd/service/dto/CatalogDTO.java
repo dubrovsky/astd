@@ -14,7 +14,7 @@ public class CatalogDTO extends CatalogBaseDTO {
     private Long parentCatalogId;
     private boolean readOnly;
     private int level;
-    private Catalog.Type type = Catalog.Type.DEFAULT;
+//    private Catalog.Type type = Catalog.Type.DEFAULT;
     private File.BranchType branchType = File.BranchType.DEFAULT;
     private boolean isCatalog = true;
 
@@ -29,10 +29,10 @@ public class CatalogDTO extends CatalogBaseDTO {
     }
 
     public CatalogDTO(Long parentCatalogId, Catalog.Type type, Long id, Long dbId, File.BranchType branchType) {
-        super(id, type.getName());
+        super(id, type.getName(), type);
 
         this.parentCatalogId = parentCatalogId;
-        this.type = type;
+//        this.type = type;
         this.text = type.getName();
         this.level = type.getLevel();
         this.readOnly = type.isReadOnly();
@@ -64,13 +64,13 @@ public class CatalogDTO extends CatalogBaseDTO {
         this.level = level;
     }
 
-    public Catalog.Type getType() {
+   /* public Catalog.Type getType() {
         return type;
     }
 
     public void setType(Catalog.Type type) {
         this.type = type;
-    }
+    }*/
 
     /*public Set<CatalogDTO> getChildCatalogs() {
         return childCatalogs;

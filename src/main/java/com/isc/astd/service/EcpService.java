@@ -13,6 +13,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Paths;
 import java.security.cert.PKIXBuilderParameters;
@@ -37,7 +39,7 @@ public class EcpService {
     private final FilePositionRepository filePositionRepository;
 
     private final FileRepository fileRepository;
-    
+
     private final PKIXBuilderParameters pkixBuilderParameters;
 
     public EcpService(ApplicationProperties properties, FileSystemService fileSystemService, FilePositionRepository filePositionRepository, FileRepository fileRepository) throws Exception {
@@ -77,15 +79,16 @@ public class EcpService {
         List<HashDTO> hashs = new ArrayList<>(doc.getFiles().size());
         List<File> toSort = sortFiles(doc);
         for (File file : toSort) {
-            byte[] bytes = fileSystemService.readFile(file, doc);
+            byte[] bytes = fileSystemService.readFile(file);
             hashs.add(new HashDTO(file.getId(), getHash(bytes)));
         }
         return hashs;
     }
 
-    HashDTO getRealHash(Doc doc, File file) throws Exception {
-        byte[] bytes = fileSystemService.readFile(file, doc);
-        return new HashDTO(file.getId(), getHash(bytes));
+    public HashDTO getRealHash(long fileId) throws Exception {
+        File file = fileRepository.getOne(fileId);
+        byte[] bytes = fileSystemService.readFile(file);
+        return new HashDTO(fileId, getHash(bytes));
     }
 
     private List<File> sortFiles(Doc doc) {
@@ -96,7 +99,7 @@ public class EcpService {
 
     byte[] decodeEcp(String ecp) {
         byte[] data;
-        if(Base64.isBase64(ecp)){
+        if (Base64.isBase64(ecp)) {
             data = Base64.decodeBase64(ecp);
         } else {
             data = ecp.getBytes();
@@ -104,20 +107,35 @@ public class EcpService {
         return data;
     }
 
-    boolean isRouterEcpsValid(byte[] hash, File file, User user) throws Exception {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public boolean fileCheckAllEcpsAndUpdate(byte[] hash, long fileId, String userName) throws Exception {
         boolean result = true;
+        final File file = fileRepository.getOne(fileId);  // to make Propagation.REQUIRES_NEW work
         final List<FilePosition> filePositions = file.getFilePositions().stream().filter(filePosition -> filePosition.getEcp() != null).collect(Collectors.toList());
-        for(FilePosition filePosition: filePositions){
-            if(!isEcpValid(filePosition.getEcp(), hash)){
-                filePosition.setInvalid(true);
+        for (FilePosition filePosition : filePositions) {
+            if (!isEcpValid(filePosition.getEcp(), hash)) { // invalid ecp
+                if (!filePosition.isInvalid()) {
+                    filePosition.setInvalid(true);
+                    filePositionRepository.save(filePosition);
+                }
+            } else if (filePosition.isInvalid()) {
+                filePosition.setInvalid(false);
                 filePositionRepository.save(filePosition);
             }
         }
-        if(filePositions.stream().anyMatch(FilePosition::isInvalid)){
-            file.setStatus(File.Status.INVALID);
-            file.setStatusModifiedBy(user.getId());
-            fileRepository.save(file);
+        if (filePositions.stream().anyMatch(FilePosition::isInvalid)) {
+            if (file.getStatus() != File.Status.INVALID) {
+                file.setStatusPrev(file.getStatus());
+                file.setStatus(File.Status.INVALID);
+                file.setStatusModifiedBy(userName);
+                fileRepository.save(file);
+            }
             result = false;
+        } else if (file.getStatus() == File.Status.INVALID) {
+            file.setStatus(file.getStatusPrev());
+            file.setStatusPrev(null);
+            file.setStatusModifiedBy(userName);
+            fileRepository.save(file);
         }
         return result;
     }
