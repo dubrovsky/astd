@@ -8,7 +8,7 @@ import com.isc.astd.service.dto.FileBaseDTO;
 import com.isc.astd.service.dto.FileDTO;
 import com.isc.astd.service.dto.FileViewDTO;
 import com.isc.astd.service.dto.PageRequestDTO;
-import com.isc.astd.service.dto.PageableDTO;
+import com.isc.astd.service.dto.DomainPageParamsDTO;
 import com.isc.astd.service.dto.RejectFileDTO;
 import com.isc.astd.web.commons.Response;
 import com.isc.astd.web.errors.EcpException;
@@ -44,8 +44,8 @@ public class FileController {
     }
 
     @GetMapping()
-    public ResponseEntity<Response<FileBaseDTO>> getAllFiles(@RequestParam long docId, @RequestParam File.BranchType branchType, PageableDTO pageableDTO, @AuthenticationPrincipal User principal) throws IOException {
-        PageRequestDTO<FileBaseDTO> fileDTOS = fileService.getAllFiles(docId, branchType, principal, pageableDTO);
+    public ResponseEntity<Response<FileBaseDTO>> getAllFiles(@RequestParam long docId, @RequestParam File.BranchType branchType, DomainPageParamsDTO domainPageParamsDTO, @AuthenticationPrincipal User principal) throws IOException {
+        PageRequestDTO<FileBaseDTO> fileDTOS = fileService.getAllFiles(docId, branchType, principal, domainPageParamsDTO);
         return ResponseEntity.ok(new Response<>(fileDTOS.getContent(), fileDTOS.getTotalElements()));
     }
 

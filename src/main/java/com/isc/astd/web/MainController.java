@@ -5,7 +5,7 @@ import com.isc.astd.service.dto.MoreApprovedDTO;
 import com.isc.astd.service.dto.MoreRejectedDTO;
 import com.isc.astd.service.dto.MoreSignsDTO;
 import com.isc.astd.service.dto.PageRequestDTO;
-import com.isc.astd.service.dto.PageableDTO;
+import com.isc.astd.service.dto.DomainPageParamsDTO;
 import com.isc.astd.web.commons.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,26 +30,26 @@ public class MainController {
     }
 
     @GetMapping("/moresigns")
-    public ResponseEntity<Response<MoreSignsDTO>> getMoreSigns(PageableDTO pageableDTO, @AuthenticationPrincipal User principal) throws IOException {
-        PageRequestDTO<MoreSignsDTO> moreSigns = mainService.getMoreSigns(pageableDTO, principal);
+    public ResponseEntity<Response<MoreSignsDTO>> getMoreSigns(DomainPageParamsDTO domainPageParamsDTO, @AuthenticationPrincipal User principal) throws IOException {
+        PageRequestDTO<MoreSignsDTO> moreSigns = mainService.getMoreSigns(domainPageParamsDTO, principal);
         return ResponseEntity.ok(new Response<>(moreSigns.getContent(), moreSigns.getTotalElements()));
     }
 
     @GetMapping("/moresignsassure")
-    public ResponseEntity<Response<MoreSignsDTO>> getMoreSignsAssure(PageableDTO pageableDTO, @AuthenticationPrincipal User principal) throws IOException {
-        PageRequestDTO<MoreSignsDTO> moreSigns = mainService.getMoreSignsAssure(pageableDTO, principal);
+    public ResponseEntity<Response<MoreSignsDTO>> getMoreSignsAssure(DomainPageParamsDTO domainPageParamsDTO, @AuthenticationPrincipal User principal) throws IOException {
+        PageRequestDTO<MoreSignsDTO> moreSigns = mainService.getMoreSignsAssure(domainPageParamsDTO, principal);
         return ResponseEntity.ok(new Response<>(moreSigns.getContent(), moreSigns.getTotalElements()));
     }
 
     @GetMapping("/morerejected")
-    public ResponseEntity<Response<MoreRejectedDTO>> getMoreRejected(PageableDTO pageableDTO, @AuthenticationPrincipal User principal) throws IOException {
-        PageRequestDTO<MoreRejectedDTO> moreRejected = mainService.getMoreRejected(pageableDTO, principal);
+    public ResponseEntity<Response<MoreRejectedDTO>> getMoreRejected(DomainPageParamsDTO domainPageParamsDTO, @AuthenticationPrincipal User principal) throws IOException {
+        PageRequestDTO<MoreRejectedDTO> moreRejected = mainService.getMoreRejected(domainPageParamsDTO, principal);
         return ResponseEntity.ok(new Response<>(moreRejected.getContent(), moreRejected.getTotalElements()));
     }
 
     @GetMapping("/moreapproved")
-    public ResponseEntity<Response<MoreApprovedDTO>> getMoreApproved(PageableDTO pageableDTO, @AuthenticationPrincipal User principal) throws IOException {
-        PageRequestDTO<MoreApprovedDTO> moreApproved = mainService.getMoreApproved(pageableDTO, principal);
+    public ResponseEntity<Response<MoreApprovedDTO>> getMoreApproved(DomainPageParamsDTO domainPageParamsDTO, @AuthenticationPrincipal User principal) throws IOException {
+        PageRequestDTO<MoreApprovedDTO> moreApproved = mainService.getMoreApproved(domainPageParamsDTO, principal);
         return ResponseEntity.ok(new Response<>(moreApproved.getContent(), moreApproved.getTotalElements()));
     }
 }

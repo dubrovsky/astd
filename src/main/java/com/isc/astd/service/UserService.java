@@ -51,10 +51,10 @@ public class UserService {
         return mapper.map(user, UserDTO.class);
     }
 
-	public PageRequestDTO<UserDTO> getAllUsers(org.springframework.security.core.userdetails.User principal, PageableDTO pageableDTO, UserFilterDTO filterDTO) {
+	public PageRequestDTO<UserDTO> getAllUsers(org.springframework.security.core.userdetails.User principal, DomainPageParamsDTO domainPageParamsDTO, UserFilterDTO filterDTO) {
 		Page<User> users = userRepository.findAll(
 				UserSpecification.filter(filterDTO),
-				PageRequest.of(pageableDTO.getPage() - 1, pageableDTO.getLimit(), Sort.by(Sort.Direction.DESC, "id"))
+				PageRequest.of(domainPageParamsDTO.getPage() - 1, domainPageParamsDTO.getLimit(), Sort.by(Sort.Direction.DESC, "id"))
 		);
 		return new PageRequestDTO<>(users.getTotalPages(), users.getTotalElements(), mapper.mapAsList(users, UserDTO.class));
 	}

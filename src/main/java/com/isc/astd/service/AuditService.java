@@ -6,7 +6,7 @@ import com.isc.astd.domain.Audit;
 import com.isc.astd.repository.AuditRepository;
 import com.isc.astd.service.dto.AuditDTO;
 import com.isc.astd.service.dto.PageRequestDTO;
-import com.isc.astd.service.dto.PageableDTO;
+import com.isc.astd.service.dto.DomainPageParamsDTO;
 import com.isc.astd.service.json.Views;
 import com.isc.astd.service.mapper.Mapper;
 import org.springframework.data.domain.Page;
@@ -124,9 +124,9 @@ public class AuditService {
         field.setAccessible(false);
     }
 
-    public PageRequestDTO<AuditDTO> getAllEntities(User user, PageableDTO pageableDTO) {
+    public PageRequestDTO<AuditDTO> getAllEntities(User user, DomainPageParamsDTO domainPageParamsDTO) {
         Page<Audit> entityAudits = entityAuditRepository.findAll(
-                PageRequest.of(pageableDTO.getPage() - 1, pageableDTO.getLimit(), Sort.by(Sort.Direction.DESC, "id"))
+                PageRequest.of(domainPageParamsDTO.getPage() - 1, domainPageParamsDTO.getLimit(), Sort.by(Sort.Direction.DESC, "id"))
         );
         List<AuditDTO> auditDTOs = new ArrayList<>(entityAudits.getContent().size());
         entityAudits.forEach(entityAudit -> {

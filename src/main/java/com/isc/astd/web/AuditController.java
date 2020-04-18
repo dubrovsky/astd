@@ -3,7 +3,7 @@ package com.isc.astd.web;
 import com.isc.astd.service.AuditService;
 import com.isc.astd.service.dto.AuditDTO;
 import com.isc.astd.service.dto.PageRequestDTO;
-import com.isc.astd.service.dto.PageableDTO;
+import com.isc.astd.service.dto.DomainPageParamsDTO;
 import com.isc.astd.web.commons.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,8 +26,8 @@ public class AuditController {
     }
 
     @GetMapping()
-    public ResponseEntity<Response<AuditDTO>> getAllEntities(PageableDTO pageableDTO, @AuthenticationPrincipal User user){
-        PageRequestDTO<AuditDTO> pageRequestDTO = entityAuditService.getAllEntities(user, pageableDTO);
+    public ResponseEntity<Response<AuditDTO>> getAllEntities(DomainPageParamsDTO domainPageParamsDTO, @AuthenticationPrincipal User user){
+        PageRequestDTO<AuditDTO> pageRequestDTO = entityAuditService.getAllEntities(user, domainPageParamsDTO);
         return ResponseEntity.ok(new Response<>(pageRequestDTO.getContent(), pageRequestDTO.getTotalElements()));
     }
 }

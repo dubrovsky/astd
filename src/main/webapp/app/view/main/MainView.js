@@ -27,7 +27,9 @@ Ext.define('ASTD.view.main.MainView', {
         'Ext.toolbar.Separator',
         'Ext.form.RadioGroup',
         'Ext.form.field.Radio',
-        'Ext.button.Button'
+        'Ext.button.Button',
+        'Ext.menu.Menu',
+        'Ext.menu.Item'
     ],
 
     controller: 'main.mainview',
@@ -74,7 +76,7 @@ Ext.define('ASTD.view.main.MainView', {
                     xtype: 'container',
                     height: 70,
                     id: 'app-header-right',
-                    width: 930,
+                    width: 1100,
                     layout: {
                         type: 'vbox',
                         align: 'right'
@@ -140,6 +142,36 @@ Ext.define('ASTD.view.main.MainView', {
                                             }
                                         }
                                     ]
+                                },
+                                {
+                                    xtype: 'tbseparator'
+                                },
+                                {
+                                    xtype: 'button',
+                                    style: 'border: 1px solid #333399;',
+                                    iconCls: 'x-fa fa-search',
+                                    text: 'Поиск',
+                                    menu: {
+                                        xtype: 'menu',
+                                        items: [
+                                            {
+                                                xtype: 'menuitem',
+                                                iconCls: 'x-fa fa-drafting-compass',
+                                                text: 'Чертежи',
+                                                listeners: {
+                                                    click: 'onSearchDocsBtnClick'
+                                                }
+                                            },
+                                            {
+                                                xtype: 'menuitem',
+                                                iconCls: 'x-fa fa-layer-group',
+                                                text: 'Листы',
+                                                listeners: {
+                                                    click: 'onSearchFilesBtnClick'
+                                                }
+                                            }
+                                        ]
+                                    }
                                 },
                                 {
                                     xtype: 'tbseparator'

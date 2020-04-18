@@ -1,9 +1,9 @@
 package com.isc.astd.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.isc.astd.domain.Doc;
-import com.isc.astd.service.dto.MoreApprovedDTO;
-import com.isc.astd.service.dto.MoreRejectedDTO;
-import com.isc.astd.service.dto.MoreSignsDTO;
+import com.isc.astd.service.dto.*;
+import com.isc.astd.service.util.DomainUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaContext;
@@ -24,14 +24,13 @@ import java.util.stream.Collectors;
 public class DocRepositoryImpl implements DocRepositoryCustom {
 
     private final EntityManager em;
-    /*
-     @PersistenceContext
-    protected EntityManager em;
-    * */
+
+    private final DomainUtils domainUtils;
 
     @Autowired
-    public DocRepositoryImpl(JpaContext context) {
+    public DocRepositoryImpl(JpaContext context, DomainUtils domainUtils) {
         this.em = context.getEntityManagerByManagedType(Doc.class);
+        this.domainUtils = domainUtils;
     }
 
     @Override
@@ -240,10 +239,93 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
         return result;
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T searchDocs(Long rootCatalogId, Integer start, Integer limit, String sort, String filters, boolean isCount) throws JsonProcessingException {
+        assert filters != null;
+
+        final Query query = em.createNativeQuery(
+                "SELECT\n" +
+                        (!isCount ?
+                                "  ccc.name AS rootCatalogName,\n" +
+                                        "  c.id AS docCatalogId,\n" +
+                                        "  c.name AS docCatalogName,\n" +
+                                        "  d.id AS docId,\n" +
+                                        "  d.npp AS docNpp,\n" +
+                                        "  d.num AS docNum,\n" +
+                                        "  d.descr AS docDescr,\n" +
+                                        "  (SELECT\n" +
+                                        "    COUNT(*)\n" +
+                                        "  FROM\n" +
+                                        "    `file` f2\n" +
+                                        "  WHERE f2.doc_id = d.id\n" +
+                                        "    AND f2.branch_type = 'default') AS filesDefaultCount,\n" +
+                                        "  (SELECT\n" +
+                                        "    COUNT(*)\n" +
+                                        "  FROM\n" +
+                                        "    `file` f2\n" +
+                                        "  WHERE f2.doc_id = d.id\n" +
+                                        "    AND f2.branch_type = 'approved') AS filesApprovedCount,\n" +
+                                        "  (SELECT\n" +
+                                        "    COUNT(*)\n" +
+                                        "  FROM\n" +
+                                        "    `file` f2\n" +
+                                        "  WHERE f2.doc_id = d.id\n" +
+                                        "    AND f2.branch_type = 'archive') AS filesArchiveCount,\n" +
+                                        "  (SELECT\n" +
+                                        "    COUNT(*)\n" +
+                                        "  FROM\n" +
+                                        "    `file` f2\n" +
+                                        "  WHERE f2.doc_id = d.id) AS filesAllCount\n" :
+                                " COUNT(*) AS count\n"
+                        ) +
+                        "FROM\n" +
+                        "  doc d\n" +
+                        "  JOIN catalog c\n" +
+                        "    ON c.id = d.catalog_id\n" +
+                        (rootCatalogId != null ? " AND d.root_cat_id = :rootCatalogId\n" : "") +
+                        "  JOIN catalog cc\n" +
+                        "    ON cc.id = c.parent_catalog_id\n" +
+                        "  JOIN catalog ccc\n" +
+                        "    ON ccc.id = cc.parent_catalog_id\n" +
+                        "WHERE \n" +
+                        domainUtils.getFilters(filters, "d.") +
+                        (!isCount ? " ORDER BY " + domainUtils.getSorts(sort, "d.last_modified_date", "desc") : ""),
+                Tuple.class
+        );
+
+        if (rootCatalogId != null) {
+            query.setParameter("rootCatalogId", rootCatalogId);
+        }
+
+        T result;
+        if (!isCount) {
+            query.setFirstResult(start).setMaxResults(limit);
+            List<Tuple> tupleList = query.getResultList();
+            return (T) tupleList.stream().map(tuple -> new DocSearchDTO(
+                    ((BigInteger) tuple.get("docId")).longValue(),
+                    ((BigInteger) tuple.get("docCatalogId")).longValue(),
+                    ((BigInteger) tuple.get("docNpp")).longValue(),
+                    String.valueOf(tuple.get("docNum") != null ? tuple.get("docNum") : ""),
+                    String.valueOf(tuple.get("docDescr") != null ? tuple.get("docDescr") : ""),
+                    String.valueOf(tuple.get("rootCatalogName") != null ? tuple.get("rootCatalogName") : ""),
+                    String.valueOf(tuple.get("docCatalogName") != null ? tuple.get("docCatalogName") : ""),
+                    ((BigInteger) tuple.get("filesDefaultCount")).longValue(),
+                    ((BigInteger) tuple.get("filesApprovedCount")).longValue(),
+                    ((BigInteger) tuple.get("filesArchiveCount")).longValue(),
+                    ((BigInteger) tuple.get("filesAllCount")).longValue()
+            )).collect(Collectors.toList());
+        } else {
+            Tuple tuple = (Tuple) query.getSingleResult();
+            result = (T) tuple.get("count");
+        }
+
+        return result;
+    }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T findDocsWithRejectedFiles(Long positionId, Long rootCatalogId, int start, int limit, Sort sort, boolean isCount) {
+    public <T> T findDocsWithRejectedFiles(Long positionId, Long rootCatalogId, Integer start, Integer limit, Sort sort, boolean isCount) {
         Sort.Order order = null;
         if (!isCount) {
             order = sort.iterator().next();

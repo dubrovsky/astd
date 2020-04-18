@@ -25,8 +25,8 @@ public class UserController {
     }
 
 	@GetMapping()
-	public ResponseEntity<Response<UserDTO>> getAllUsers(PageableDTO pageableDTO, UserFilterDTO filterDTO, @AuthenticationPrincipal User principal) {
-		PageRequestDTO<UserDTO> allUsers = userService.getAllUsers(principal, pageableDTO, filterDTO);
+	public ResponseEntity<Response<UserDTO>> getAllUsers(DomainPageParamsDTO domainPageParamsDTO, UserFilterDTO filterDTO, @AuthenticationPrincipal User principal) {
+		PageRequestDTO<UserDTO> allUsers = userService.getAllUsers(principal, domainPageParamsDTO, filterDTO);
 		return ResponseEntity.ok(new Response<>(allUsers.getContent(), allUsers.getTotalElements()));
 	}
 

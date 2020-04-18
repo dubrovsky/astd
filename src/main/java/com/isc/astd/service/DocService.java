@@ -6,14 +6,9 @@ import com.isc.astd.domain.Doc;
 import com.isc.astd.domain.File;
 import com.isc.astd.repository.DocRepository;
 import com.isc.astd.repository.specification.DocSpecification;
-import com.isc.astd.service.dto.DocDTO;
-import com.isc.astd.service.dto.MoreApprovedDTO;
-import com.isc.astd.service.dto.MoreRejectedDTO;
-import com.isc.astd.service.dto.MoreSignsDTO;
-import com.isc.astd.service.dto.PageRequestDTO;
-import com.isc.astd.service.dto.PageableDTO;
+import com.isc.astd.service.dto.*;
 import com.isc.astd.service.mapper.Mapper;
-import com.isc.astd.service.util.Utils;
+import com.isc.astd.service.util.DomainUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -43,29 +38,26 @@ public class DocService {
 
     private final FileEcpService fileEcpService;
 
-    private final Utils utils;
+    private final DomainUtils domainUtils;
 
-    private final PositionService positionService;
+    private final UserService userService;
 
-    private final FileService fileService;
-
-    public DocService(DocRepository docRepository, Mapper mapper, FileSystemService fileSystemService, CatalogService catalogService, FileEcpService fileEcpService, Utils utils, PositionService positionService, FileService fileService) {
+    public DocService(DocRepository docRepository, Mapper mapper, FileSystemService fileSystemService, CatalogService catalogService, FileEcpService fileEcpService, DomainUtils domainUtils, PositionService positionService, FileService fileService, UserService userService) {
         this.docRepository = docRepository;
         this.mapper = mapper;
         this.fileSystemService = fileSystemService;
         this.catalogService = catalogService;
         this.fileEcpService = fileEcpService;
-        this.utils = utils;
-        this.positionService = positionService;
-        this.fileService = fileService;
+        this.domainUtils = domainUtils;
+        this.userService = userService;
     }
 
     @Transactional(readOnly = true)
-    public PageRequestDTO<DocDTO> getAllDocs(long catalogId, File.BranchType branchType, User user, PageableDTO pageableDTO) throws IOException {
+    public PageRequestDTO<DocDTO> getAllDocs(long catalogId, File.BranchType branchType, User user, DomainPageParamsDTO pageParams) throws IOException {
 //        List<Doc> docs = docRepository.findAllByCatalogId(catalogId);
         Page<Doc> docs = docRepository.findAll(
                 DocSpecification.byCatalogIdAndBranchType(catalogId, branchType),
-                PageRequest.of(pageableDTO.getPage() - 1, pageableDTO.getLimit(), utils.getSort(pageableDTO, "npp", null))
+                PageRequest.of(pageParams.getPage() - 1, pageParams.getLimit(), domainUtils.getSort(pageParams.getSort(), "npp", null))
         );
         List<DocDTO> docDTOs = new ArrayList<>(docs.getContent().size());
         docs.forEach(doc -> {
@@ -139,13 +131,13 @@ public class DocService {
 
 
     @Transactional(readOnly = true)
-    public PageRequestDTO<MoreSignsDTO> getMoreSigns(PageableDTO pageableDTO, com.isc.astd.domain.User user) throws IOException {
+    public PageRequestDTO<MoreSignsDTO> getMoreSigns(DomainPageParamsDTO pageParams, com.isc.astd.domain.User user) throws IOException {
         final List<MoreSignsDTO> docs = docRepository.findDocsWithFilesToSign(
                 user.getPosition().getId(),
                 user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
-                pageableDTO.getStart(),
-                pageableDTO.getLimit(),
-                utils.getSort(pageableDTO, "dateSign", Sort.Direction.ASC),
+                pageParams.getStart(),
+                pageParams.getLimit(),
+                domainUtils.getSort(pageParams.getSort(), "dateSign", Sort.Direction.ASC),
                 false
         );
 
@@ -161,22 +153,22 @@ public class DocService {
         return new PageRequestDTO<>(total.longValue(), docs);
     }
 
-    public PageRequestDTO<MoreSignsDTO> getMoreSignsAssure(PageableDTO pageableDTO, com.isc.astd.domain.User user) throws IOException {
+    public PageRequestDTO<MoreSignsDTO> getMoreSignsAssure(DomainPageParamsDTO pageParams, com.isc.astd.domain.User user) throws IOException {
         final List<MoreSignsDTO> docs = docRepository.findDocsWithFilesAssureToSign(
                 user.getPosition().getId(),
                 user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
-                pageableDTO.getStart(),
-                pageableDTO.getLimit(),
-                utils.getSort(pageableDTO, "dateSign", Sort.Direction.ASC),
+                pageParams.getStart(),
+                pageParams.getLimit(),
+                domainUtils.getSort(pageParams.getSort(), "dateSign", Sort.Direction.ASC),
                 false
         );
 
         final BigInteger total = docRepository.findDocsWithFilesAssureToSign(
                 user.getPosition().getId(),
                 user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
-                pageableDTO.getStart(),
-                pageableDTO.getLimit(),
-                utils.getSort(pageableDTO, "dateSign", Sort.Direction.DESC),
+                null,
+                null,
+                null,
                 true
         );
 
@@ -184,22 +176,22 @@ public class DocService {
     }
 
     @Transactional(readOnly = true)
-    public PageRequestDTO<MoreRejectedDTO> getMoreRejected(PageableDTO pageableDTO, com.isc.astd.domain.User user) throws IOException {
+    public PageRequestDTO<MoreRejectedDTO> getMoreRejected(DomainPageParamsDTO pageParams, com.isc.astd.domain.User user) throws IOException {
         final List<MoreRejectedDTO> docs = docRepository.findDocsWithRejectedFiles(
                 user.getPosition().getId(),
                 user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
-                pageableDTO.getStart(),
-                pageableDTO.getLimit(),
-                utils.getSort(pageableDTO, "dateSign", Sort.Direction.DESC),
+                pageParams.getStart(),
+                pageParams.getLimit(),
+                domainUtils.getSort(pageParams.getSort(), "dateSign", Sort.Direction.DESC),
                 false
         );
 
         final BigInteger total = docRepository.findDocsWithRejectedFiles(
                 user.getPosition().getId(),
                 user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
-                pageableDTO.getStart(),
-                pageableDTO.getLimit(),
-                utils.getSort(pageableDTO, "dateSign", Sort.Direction.DESC),
+                null,
+                null,
+                null,
                 true
         );
 
@@ -207,20 +199,20 @@ public class DocService {
     }
 
     @Transactional(readOnly = true)
-    public PageRequestDTO<MoreApprovedDTO> getMoreApproved(PageableDTO pageableDTO, com.isc.astd.domain.User user) throws IOException {
+    public PageRequestDTO<MoreApprovedDTO> getMoreApproved(DomainPageParamsDTO pageParams, com.isc.astd.domain.User user) throws IOException {
         final List<MoreApprovedDTO> docs = docRepository.findDocsWithApprovedFiles(
                 user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
-                pageableDTO.getStart(),
-                pageableDTO.getLimit(),
-                utils.getSort(pageableDTO, "dateSign", Sort.Direction.DESC),
+                pageParams.getStart(),
+                pageParams.getLimit(),
+                domainUtils.getSort(pageParams.getSort(), "dateSign", Sort.Direction.DESC),
                 false
         );
 
         final BigInteger total = docRepository.findDocsWithApprovedFiles(
                 user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
-                pageableDTO.getStart(),
-                pageableDTO.getLimit(),
-                utils.getSort(pageableDTO, "dateSign", Sort.Direction.DESC),
+                null,
+                null,
+                null,
                 true
         );
 
@@ -230,5 +222,29 @@ public class DocService {
     public DocDTO getDocById(long docId, User principal, File.BranchType branchType) {
         Doc doc = getDoc(docId);
         return getDoc(branchType, principal, doc);
+    }
+
+    public PageRequestDTO<DocSearchDTO> searchDocs(DomainPageParamsDTO pageParams, User principal) throws IOException {
+        final com.isc.astd.domain.User user = userService.getUser(principal.getUsername());
+
+        final List<DocSearchDTO> docs = docRepository.searchDocs(
+                user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
+                pageParams.getStart(),
+                pageParams.getLimit(),
+                pageParams.getSort(),
+                pageParams.getFilter(),
+                false
+        );
+
+        final BigInteger total = docRepository.searchDocs(
+                user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
+                null,
+                null,
+                null,
+                pageParams.getFilter(),
+                true
+        );
+
+        return new PageRequestDTO<>(total.longValue(), docs);
     }
 }

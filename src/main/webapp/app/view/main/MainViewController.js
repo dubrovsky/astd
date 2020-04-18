@@ -105,6 +105,10 @@ Ext.define('ASTD.view.main.MainViewController', {
                     goToSelectedDoc: this.onGoToSelectedDoc,
                     toggleCollapse: this.onToggleMoreListCollapse
                 },
+                '#mainSearchDocsListViewController': {
+                  //  goToSelectedDoc: this.onGoToSelectedDoc,
+                    toggleCollapse: this.onToggleMoreListCollapse
+                },
                 '#fileFormViewController': {
                     clickFileHistoryBtn: this.onClickFileHistoryBtn
                 },
@@ -247,26 +251,25 @@ Ext.define('ASTD.view.main.MainViewController', {
                 });
     },
 
-    moreBtnClick: function(xtype) {
-                var morelist = this.getView().lookup('morelist');
-                if(!morelist || !morelist.isXType(xtype, true)) {
-                   // var fileList = new ASTD.view.main.MainMoreSignsListView1({
-                    var fileList = Ext.widget(xtype, {
-                        region: 'east',
-                        viewModel: {
-                            data: {
-                                tree: this.lookup('catalogList')
-                            }
-                        }
-                    });
-                    if(morelist) {
-                       this.getView().remove(morelist);
+    showEastPanel: function(xtype) {
+        var morelist = this.getView().lookup('morelist') || this.getView().lookup('searchlist');
+        if(!morelist || !morelist.isXType(xtype, true)) {
+            var fileList = Ext.widget(xtype, {
+                region: 'east',
+                viewModel: {
+                    data: {
+                        tree: this.lookup('catalogList')
                     }
-                    this.getView().add(fileList);
-                } else {
-                    morelist.toggleCollapse();
-                    //this.getView().updateLayout();
                 }
+            });
+            if(morelist) {
+                this.getView().remove(morelist);
+            }
+            this.getView().add(fileList);
+        } else {
+            morelist.toggleCollapse();
+            //this.getView().updateLayout();
+        }
     },
 
     onToggleMoreListCollapse: function(panel) {
@@ -392,20 +395,28 @@ Ext.define('ASTD.view.main.MainViewController', {
         }
     },
 
+    onSearchDocsBtnClick: function(item, e, eOpts) {
+        this.showEastPanel('mainsearchdocslistview');
+    },
+
+    onSearchFilesBtnClick: function(item, e, eOpts) {
+        this.showEastPanel('mainsearchfileslistview');
+    },
+
     onMoreSignsBtnClick: function(button, e, eOpts) {
-        this.moreBtnClick('mainmoresignslistview');
+        this.showEastPanel('mainmoresignslistview');
     },
 
     onMoreSignsAssureBtnClick: function(button, e, eOpts) {
-        this.moreBtnClick('mainmoresignsassurelistview');
+        this.showEastPanel('mainmoresignsassurelistview');
     },
 
     onMoreApprovedBtnClick: function(button, e, eOpts) {
-        this.moreBtnClick('mainmoreapprovedlistview');
+        this.showEastPanel('mainmoreapprovedlistview');
     },
 
     onMoreRejectedBtnClick: function(button, e, eOpts) {
-        this.moreBtnClick('mainmorerejectedlistview');
+        this.showEastPanel('mainmorerejectedlistview');
     }
 
 });

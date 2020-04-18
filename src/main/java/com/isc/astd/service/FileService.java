@@ -15,11 +15,11 @@ import com.isc.astd.service.dto.FileBaseDTO;
 import com.isc.astd.service.dto.FileDTO;
 import com.isc.astd.service.dto.FileViewDTO;
 import com.isc.astd.service.dto.PageRequestDTO;
-import com.isc.astd.service.dto.PageableDTO;
+import com.isc.astd.service.dto.DomainPageParamsDTO;
 import com.isc.astd.service.dto.RejectFileDTO;
 import com.isc.astd.service.dto.SignedPositionDTO;
 import com.isc.astd.service.mapper.Mapper;
-import com.isc.astd.service.util.Utils;
+import com.isc.astd.service.util.DomainUtils;
 import com.isc.astd.web.errors.EcpException;
 import org.springframework.beans.PropertyAccessor;
 import org.springframework.beans.PropertyAccessorFactory;
@@ -65,9 +65,9 @@ public class FileService {
 
     private final ObjectMapper objectMapper;
 
-    private final Utils utils;
+    private final DomainUtils utils;
 
-    public FileService(FileRepository fileRepository, Mapper mapper, FileSystemService fileSystemService, @Lazy DocService docService, EcpService ecpService, RouteService routeService, FilePositionRepository filePositionRepository, UserService userService, FileEcpService fileEcpService, ObjectMapper objectMapper, Utils utils) {
+    public FileService(FileRepository fileRepository, Mapper mapper, FileSystemService fileSystemService, @Lazy DocService docService, EcpService ecpService, RouteService routeService, FilePositionRepository filePositionRepository, UserService userService, FileEcpService fileEcpService, ObjectMapper objectMapper, DomainUtils utils) {
         this.fileRepository = fileRepository;
         this.mapper = mapper;
         this.fileSystemService = fileSystemService;
@@ -82,12 +82,12 @@ public class FileService {
     }
 
     @Transactional(readOnly = true)
-    public PageRequestDTO<FileBaseDTO> getAllFiles(long docId, File.BranchType branchType, User user, PageableDTO pageableDTO) throws IOException {
+    public PageRequestDTO<FileBaseDTO> getAllFiles(long docId, File.BranchType branchType, User user, DomainPageParamsDTO domainPageParamsDTO) throws IOException {
 		/*Page<File> files = fileRepository.findAllByDocIdAndBranchType(
 				docId, branchType, PageRequest.of(pageableDTO.getPage() - 1, pageableDTO.getLimit(), utils.getSortUnsafe(pageableDTO))
 		);*/
 
-        Page<File> files = fileRepository.findByByDocIdAndBranchType(docId, branchType, PageRequest.of(pageableDTO.getPage() - 1, pageableDTO.getLimit(), utils.getSortUnsafe(pageableDTO, "listNum")));
+        Page<File> files = fileRepository.findByByDocIdAndBranchType(docId, branchType, PageRequest.of(domainPageParamsDTO.getPage() - 1, domainPageParamsDTO.getLimit(), utils.getSortUnsafe(domainPageParamsDTO.getSort(), "listNum")));
         List<FileBaseDTO> fileDTOs = new ArrayList<>(files.getContent().size());
         Position myPosition = userService.getUser(user.getUsername()).getPosition();
         files.forEach(file -> {
