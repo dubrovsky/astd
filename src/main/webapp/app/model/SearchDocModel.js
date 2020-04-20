@@ -36,22 +36,32 @@ Ext.define('ASTD.model.SearchDocModel', {
             name: 'descr'
         },
         {
+            type: 'int',
+            name: 'docCatalogId'
+        },
+        {
             type: 'string',
-            name: 'noteShl'
+            name: 'rootCatalogName'
+        },
+        {
+            type: 'string',
+            name: 'docCatalogName'
         },
         {
             type: 'int',
-            name: 'catalogId'
+            name: 'filesDefaultCount'
         },
         {
             type: 'int',
-            defaultValue: 0,
-            name: 'filesNum'
+            name: 'filesApprovedCount'
         },
         {
             type: 'int',
-            defaultValue: 0,
-            name: 'signNum'
+            name: 'filesArchiveCount'
+        },
+        {
+            type: 'int',
+            name: 'filesAllCount'
         }
     ]
 });

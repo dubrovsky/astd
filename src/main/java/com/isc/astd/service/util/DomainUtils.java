@@ -69,13 +69,40 @@ public class DomainUtils {
                     if (filterCount > 0) {
                         filtersBuilder.append(" AND ");
                     }
-                    filtersBuilder.append(prefix).append(filter.getProperty()).append(filter.getOperator()).append(filter.getValue());
+                    filtersBuilder.
+                            append(prefix).
+                            append(filter.getProperty()).
+                            append(getFilterOperator(filter.getOperator())).
+                            append(getFilterValue(filter.getValue(), filter.getOperator()));
                     filterCount++;
                 }
             }
             return filtersBuilder.toString();
         }
         return null;
+    }
+
+    private String getFilterValue(String value, String operator) {
+        StringBuilder sb = new StringBuilder();
+        if (StringUtils.isNumeric(value)) {
+            sb.append(value);
+        } else { // string
+            sb.append("'");
+            if (operator.equals("like")) {
+                sb.append("%").append(value).append("%");
+            } else {
+                sb.append(value);
+            }
+            sb.append("'");
+        }
+        return sb.toString();
+    }
+
+    private String getFilterOperator(String operator) {
+        if (operator.equals("like")) {
+            return " LIKE ";
+        }
+        return operator;
     }
 
     /*

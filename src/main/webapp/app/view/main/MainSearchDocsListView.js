@@ -20,7 +20,7 @@ Ext.define('ASTD.view.main.MainSearchDocsListView', {
     requires: [
         'ASTD.view.main.MainSearchDocsListViewModel',
         'ASTD.view.main.MainSearchDocsListViewController',
-        'Ext.grid.column.Number',
+        'Ext.grid.column.Column',
         'Ext.view.Table',
         'Ext.toolbar.Paging',
         'Ext.button.Button',
@@ -52,8 +52,19 @@ Ext.define('ASTD.view.main.MainSearchDocsListView', {
     columns: [
         {
             xtype: 'gridcolumn',
+            width: 80,
             dataIndex: 'npp',
             text: '№ п/п'
+        },
+        {
+            xtype: 'gridcolumn',
+            renderer: function(value, metaData, record, rowIndex, colIndex, store, view) {
+                metaData.style = 'white-space:normal;';
+                return record.get('rootCatalogName') + ' > ' + record.get('docCatalogName');
+            },
+            width: 150,
+            dataIndex: 'docCatalogName',
+            text: 'Путь'
         },
         {
             xtype: 'gridcolumn',
@@ -78,33 +89,14 @@ Ext.define('ASTD.view.main.MainSearchDocsListView', {
             xtype: 'gridcolumn',
             renderer: function(value, metaData, record, rowIndex, colIndex, store, view) {
                 metaData.style = 'white-space:normal;';
-                return value;
+                return record.get('filesDefaultCount') + ' / ' +
+                record.get('filesApprovedCount')+ ' / ' +
+                record.get('filesArchiveCount')+ ' / ' +
+                record.get('filesAllCount');
             },
-            flex: 1,
-            dataIndex: 'noteShl',
-            text: 'Комментарий',
-            bind: {
-                hidden: '{current.user.positionId !== 5}'
-            }
-        },
-        {
-            xtype: 'numbercolumn',
-            width: 150,
-            sortable: false,
-            dataIndex: 'filesNum',
-            text: 'Загружено файлов',
-            format: '0'
-        },
-        {
-            xtype: 'gridcolumn',
-            renderer: function(value, metaData, record, rowIndex, colIndex, store, view) {
-                if(value) metaData.tdCls = 'my-next-sign';
-                return value;
-            },
-            width: 100,
-            sortable: true,
-            dataIndex: 'signNum',
-            text: 'На подпись'
+            width: 180,
+            dataIndex: 'filesAllCount',
+            text: 'Листы<br> (раб/утв/арх/всего)'
         }
     ],
     listeners: {

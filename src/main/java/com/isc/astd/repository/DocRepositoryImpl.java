@@ -35,12 +35,7 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T findDocsWithFilesToSign(Long nextSignPositionId, Long rootCatalogId, Integer start, Integer limit, Sort sort, boolean isCount) {
-        Sort.Order order = null;
-        if (!isCount) {
-            order = sort.iterator().next();
-        }
-
+    public <T> T findDocsWithFilesToSign(Long nextSignPositionId, Long rootCatalogId, Integer start, Integer limit, /*Sort sort,*/String sort, boolean isCount) throws JsonProcessingException {
         final Query query = em.createNativeQuery(
                 "SELECT\n" +
                         (!isCount ?
@@ -103,7 +98,7 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
                         "    GROUP BY f2.doc_id) ff\n" +
                         "    ON ff.doc_id = d.id\n" +
                         "    AND ff.max_date = fp.last_modified_date \n" +
-                        (!isCount ? " ORDER BY " + order.getProperty() + " " + order.getDirection().name() : "")
+                        (!isCount ? " ORDER BY " + domainUtils.getSorts(sort, "dateSign", "asc") : "")
                 , Tuple.class
         );
         query.setParameter("nextSignPositionId", nextSignPositionId);
@@ -138,12 +133,7 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T findDocsWithFilesAssureToSign(Long nextSignPositionId, Long rootCatalogId, Integer start, Integer limit, Sort sort, boolean isCount) {
-        Sort.Order order = null;
-        if (!isCount) {
-            order = sort.iterator().next();
-        }
-
+    public <T> T findDocsWithFilesAssureToSign(Long nextSignPositionId, Long rootCatalogId, Integer start, Integer limit, String sort, boolean isCount) throws JsonProcessingException {
         final Query query = em.createNativeQuery(
                 "SELECT\n" +
                         (!isCount ?
@@ -206,7 +196,7 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
                         "    GROUP BY f2.doc_id) ff\n" +
                         "    ON ff.doc_id = d.id\n" +
                         "    AND ff.max_date = fp.last_modified_date \n" +
-                        (!isCount ? " ORDER BY " + order.getProperty() + " " + order.getDirection().name() : "")
+                        (!isCount ? " ORDER BY " + domainUtils.getSorts(sort, "dateSign", "asc") : "")
                 , Tuple.class
         );
         query.setParameter("nextSignPositionId", nextSignPositionId);
@@ -250,10 +240,10 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
                                 "  ccc.name AS rootCatalogName,\n" +
                                         "  c.id AS docCatalogId,\n" +
                                         "  c.name AS docCatalogName,\n" +
-                                        "  d.id AS docId,\n" +
-                                        "  d.npp AS docNpp,\n" +
-                                        "  d.num AS docNum,\n" +
-                                        "  d.descr AS docDescr,\n" +
+                                        "  d.id AS id,\n" +
+                                        "  d.npp AS npp,\n" +
+                                        "  d.num AS num,\n" +
+                                        "  d.descr AS descr,\n" +
                                         "  (SELECT\n" +
                                         "    COUNT(*)\n" +
                                         "  FROM\n" +
@@ -303,11 +293,11 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
             query.setFirstResult(start).setMaxResults(limit);
             List<Tuple> tupleList = query.getResultList();
             return (T) tupleList.stream().map(tuple -> new DocSearchDTO(
-                    ((BigInteger) tuple.get("docId")).longValue(),
+                    ((BigInteger) tuple.get("id")).longValue(),
                     ((BigInteger) tuple.get("docCatalogId")).longValue(),
-                    ((BigInteger) tuple.get("docNpp")).longValue(),
-                    String.valueOf(tuple.get("docNum") != null ? tuple.get("docNum") : ""),
-                    String.valueOf(tuple.get("docDescr") != null ? tuple.get("docDescr") : ""),
+                    ((BigInteger) tuple.get("npp")).longValue(),
+                    String.valueOf(tuple.get("num") != null ? tuple.get("num") : ""),
+                    String.valueOf(tuple.get("descr") != null ? tuple.get("descr") : ""),
                     String.valueOf(tuple.get("rootCatalogName") != null ? tuple.get("rootCatalogName") : ""),
                     String.valueOf(tuple.get("docCatalogName") != null ? tuple.get("docCatalogName") : ""),
                     ((BigInteger) tuple.get("filesDefaultCount")).longValue(),
@@ -325,11 +315,7 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T findDocsWithRejectedFiles(Long positionId, Long rootCatalogId, Integer start, Integer limit, Sort sort, boolean isCount) {
-        Sort.Order order = null;
-        if (!isCount) {
-            order = sort.iterator().next();
-        }
+    public <T> T findDocsWithRejectedFiles(Long positionId, Long rootCatalogId, Integer start, Integer limit, String sort, boolean isCount) throws JsonProcessingException {
 
         final Query query = em.createNativeQuery(
                 "SELECT\n" +
@@ -391,7 +377,7 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
                         "    GROUP BY f2.doc_id) ff\n" +
                         "    ON ff.doc_id = d.id\n" +
                         "    AND ff.max_date = fp.last_modified_date -- WHERE ccc.id=5 \n" +
-                        (!isCount ? " ORDER BY " + order.getProperty() + " " + order.getDirection().name() : "")
+                        (!isCount ? " ORDER BY " + domainUtils.getSorts(sort, "dateSign", "desc") : "")
                 , Tuple.class
         );
 
@@ -428,11 +414,7 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T findDocsWithApprovedFiles(Long rootCatalogId, Integer start, Integer limit, Sort sort, boolean isCount) {
-        Sort.Order order = null;
-        if (!isCount) {
-            order = sort.iterator().next();
-        }
+    public <T> T findDocsWithApprovedFiles(Long rootCatalogId, Integer start, Integer limit, String sort, boolean isCount) throws JsonProcessingException {
 
         final Query query = em.createNativeQuery(
                 "SELECT\n" +
@@ -483,7 +465,7 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
                         "    FROM\n" +
                         "      file_position fp2\n" +
                         "    WHERE fp2.file_id = fp.file_id) \n" +
-                        (!isCount ? " ORDER BY " + order.getProperty() + " " + order.getDirection().name() : "")
+                        (!isCount ? " ORDER BY " + domainUtils.getSorts(sort, "dateSign", "desc") : "")
                 , Tuple.class
         );
 

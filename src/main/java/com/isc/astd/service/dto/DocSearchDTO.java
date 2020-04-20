@@ -1,11 +1,11 @@
 package com.isc.astd.service.dto;
 
 public class DocSearchDTO {
-    private final Long docId;
+    private final Long id;
+    private final Long npp;
+    private final String num;
+    private final String descr;
     private final Long docCatalogId;
-    private final Long docNpp;
-    private final String docNum;
-    private final String docDescr;
     private final String rootCatalogName;
     private final String docCatalogName;
     private final Long filesDefaultCount;
@@ -13,12 +13,12 @@ public class DocSearchDTO {
     private final Long filesArchiveCount;
     private final Long filesAllCount;
 
-    public DocSearchDTO(Long docId, Long docCatalogId, Long docNpp, String docNum, String docDescr, String rootCatalogName, String docCatalogName, Long filesDefaultCount, Long filesApprovedCount, Long filesArchiveCount, Long filesAllCount) {
-        this.docId = docId;
+    public DocSearchDTO(Long id, Long docCatalogId, Long npp, String num, String descr, String rootCatalogName, String docCatalogName, Long filesDefaultCount, Long filesApprovedCount, Long filesArchiveCount, Long filesAllCount) {
+        this.id = id;
         this.docCatalogId = docCatalogId;
-        this.docNpp = docNpp;
-        this.docNum = docNum;
-        this.docDescr = docDescr;
+        this.npp = npp;
+        this.num = num;
+        this.descr = descr;
         this.rootCatalogName = rootCatalogName;
         this.docCatalogName = docCatalogName;
         this.filesDefaultCount = filesDefaultCount;
@@ -27,24 +27,24 @@ public class DocSearchDTO {
         this.filesAllCount = filesAllCount;
     }
 
-    public Long getDocId() {
-        return docId;
+    public Long getId() {
+        return id;
     }
 
     public Long getDocCatalogId() {
         return docCatalogId;
     }
 
-    public Long getDocNpp() {
-        return docNpp;
+    public Long getNpp() {
+        return npp;
     }
 
-    public String getDocNum() {
-        return docNum;
+    public String getNum() {
+        return num;
     }
 
-    public String getDocDescr() {
-        return docDescr;
+    public String getDescr() {
+        return descr;
     }
 
     public String getRootCatalogName() {

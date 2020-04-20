@@ -16,18 +16,7 @@ public class FilterDTO {
     }
 
     public String getValue() {
-        if (StringUtils.isNotBlank(value)) {
-            StringBuilder sb = new StringBuilder("'");
-            if (operator.equals("like")) {
-                sb.append("%").append(value).append("%");
-            } else {
-                sb.append(value);
-            }
-            sb.append("'");
-            return sb.toString();
-        } else {
-            return null;
-        }
+        return value;
     }
 
     public void setValue(String value) {
@@ -35,9 +24,6 @@ public class FilterDTO {
     }
 
     public String getOperator() {
-        if (operator.equals("like")) {
-            return " LIKE ";
-        }
         return operator;
     }
 

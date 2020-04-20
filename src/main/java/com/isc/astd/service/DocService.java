@@ -137,7 +137,8 @@ public class DocService {
                 user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
                 pageParams.getStart(),
                 pageParams.getLimit(),
-                domainUtils.getSort(pageParams.getSort(), "dateSign", Sort.Direction.ASC),
+                pageParams.getSort(),
+//                domainUtils.getSort(pageParams.getSort(), "dateSign", Sort.Direction.ASC),
                 false
         );
 
@@ -159,7 +160,7 @@ public class DocService {
                 user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
                 pageParams.getStart(),
                 pageParams.getLimit(),
-                domainUtils.getSort(pageParams.getSort(), "dateSign", Sort.Direction.ASC),
+                pageParams.getSort(),
                 false
         );
 
@@ -182,7 +183,8 @@ public class DocService {
                 user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
                 pageParams.getStart(),
                 pageParams.getLimit(),
-                domainUtils.getSort(pageParams.getSort(), "dateSign", Sort.Direction.DESC),
+                pageParams.getSort(),
+//                domainUtils.getSort(pageParams.getSort(), "dateSign", Sort.Direction.DESC),
                 false
         );
 
@@ -204,7 +206,8 @@ public class DocService {
                 user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
                 pageParams.getStart(),
                 pageParams.getLimit(),
-                domainUtils.getSort(pageParams.getSort(), "dateSign", Sort.Direction.DESC),
+                pageParams.getSort(),
+//                domainUtils.getSort(pageParams.getSort(), "dateSign", Sort.Direction.DESC),
                 false
         );
 

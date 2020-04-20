@@ -86,6 +86,9 @@ Ext.define('ASTD.view.main.MainViewController', {
                 },
                 '#mainMoreApprovedListView': {
                     clickDocList: this.onClickDocList
+                },
+                '#mainSearchDocsListView': {
+                    clickDocList: this.onClickDocList
                 }
             },
             controller: {
@@ -106,7 +109,7 @@ Ext.define('ASTD.view.main.MainViewController', {
                     toggleCollapse: this.onToggleMoreListCollapse
                 },
                 '#mainSearchDocsListViewController': {
-                  //  goToSelectedDoc: this.onGoToSelectedDoc,
+                    goToSelectedDoc: this.onGoToSelectedDoc,
                     toggleCollapse: this.onToggleMoreListCollapse
                 },
                 '#fileFormViewController': {
@@ -162,7 +165,8 @@ Ext.define('ASTD.view.main.MainViewController', {
         var viewModel = view.getViewModel();
         ASTD.model.DocModel.load(docId, {
             scope: this,
-            params: {branchType: viewModel.get("current.branchType")},
+            //params: {branchType: viewModel.get("current.branchType")},
+            params: {branchType: branchType},
             callback: function(doc, operation, success) {
                 Ext.Msg.hide();
                 if(success){

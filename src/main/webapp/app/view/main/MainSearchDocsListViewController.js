@@ -20,7 +20,7 @@ Ext.define('ASTD.view.main.MainSearchDocsListViewController', {
     id: 'mainSearchDocsListViewController',
 
     onGoToSelectedDoc: function(record) {
-        this.fireEvent('goToSelectedDoc', record.get('id'), this.getView()); // go into selected doc
+        this.fireEvent('goToSelectedDoc', record.get('id'), this.getView(), 'DEFAULT'); // go into selected doc
     },
 
     onDocItemDblClick: function(dataview, record, item, index, e, eOpts) {
