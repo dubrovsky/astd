@@ -89,6 +89,9 @@ Ext.define('ASTD.view.main.MainViewController', {
                 },
                 '#mainSearchDocsListView': {
                     clickDocList: this.onClickDocList
+                },
+                '#mainSearchFilesListView': {
+                    clickDocList: this.onClickDocList
                 }
             },
             controller: {
@@ -109,6 +112,10 @@ Ext.define('ASTD.view.main.MainViewController', {
                     toggleCollapse: this.onToggleMoreListCollapse
                 },
                 '#mainSearchDocsListViewController': {
+                    goToSelectedDoc: this.onGoToSelectedDoc,
+                    toggleCollapse: this.onToggleMoreListCollapse
+                },
+                '#mainSearchFilesListViewController': {
                     goToSelectedDoc: this.onGoToSelectedDoc,
                     toggleCollapse: this.onToggleMoreListCollapse
                 },

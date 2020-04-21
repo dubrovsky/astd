@@ -2,6 +2,7 @@ package com.isc.astd.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.isc.astd.domain.Doc;
+import com.isc.astd.domain.File;
 import com.isc.astd.service.dto.*;
 import com.isc.astd.service.util.DomainUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -232,8 +233,6 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T searchDocs(Long rootCatalogId, Integer start, Integer limit, String sort, String filters, boolean isCount) throws JsonProcessingException {
-        assert filters != null;
-
         final Query query = em.createNativeQuery(
                 "SELECT\n" +
                         (!isCount ?

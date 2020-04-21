@@ -9,15 +9,7 @@ import com.isc.astd.domain.FilePositionId;
 import com.isc.astd.domain.Position;
 import com.isc.astd.repository.FilePositionRepository;
 import com.isc.astd.repository.FileRepository;
-import com.isc.astd.service.dto.EcpDTO;
-import com.isc.astd.service.dto.EcpHashDTO;
-import com.isc.astd.service.dto.FileBaseDTO;
-import com.isc.astd.service.dto.FileDTO;
-import com.isc.astd.service.dto.FileViewDTO;
-import com.isc.astd.service.dto.PageRequestDTO;
-import com.isc.astd.service.dto.DomainPageParamsDTO;
-import com.isc.astd.service.dto.RejectFileDTO;
-import com.isc.astd.service.dto.SignedPositionDTO;
+import com.isc.astd.service.dto.*;
 import com.isc.astd.service.mapper.Mapper;
 import com.isc.astd.service.util.DomainUtils;
 import com.isc.astd.web.errors.EcpException;
@@ -31,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -569,6 +562,30 @@ public class FileService {
         fileRepository.flush();
 
         fileSystemService.deleteFile(file, docService.getDoc(file.getDoc().getId()));
+    }
+
+    public PageRequestDTO<FileSearchDTO> searchFiles(DomainPageParamsDTO pageParams, User principal) throws IOException {
+        final com.isc.astd.domain.User user = userService.getUser(principal.getUsername());
+
+        final List<FileSearchDTO> docs = fileRepository.searchFiles(
+                user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
+                pageParams.getStart(),
+                pageParams.getLimit(),
+                pageParams.getSort(),
+                pageParams.getFilter(),
+                false
+        );
+
+        final BigInteger total = fileRepository.searchFiles(
+                user.getRootCatalog() != null ? user.getRootCatalog().getId() : null,
+                null,
+                null,
+                null,
+                pageParams.getFilter(),
+                true
+        );
+
+        return new PageRequestDTO<>(total.longValue(), docs);
     }
 
     private enum DIRECTION {

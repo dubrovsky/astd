@@ -34,7 +34,8 @@ Ext.application({
         'PositionModel',
         'MoreSignsAssureModel',
         'MoreApprovedModel',
-        'SearchDocModel'
+        'SearchDocModel',
+        'SearchFileModel'
     ],
     views: [
         'main.MainView',
@@ -56,7 +57,8 @@ Ext.application({
         'main.MainMoreSignsListView',
         'main.MainMoreRejectedListView',
         'main.MainMoreSignsAssureListView',
-        'main.MainSearchDocsListView'
+        'main.MainSearchDocsListView',
+        'main.MainSearchFilesListView'
     ],
     name: 'ASTD',
 

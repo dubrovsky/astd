@@ -15,7 +15,7 @@ import java.util.List;
  * @author p.dzeviarylin
  */
 @Repository
-public interface FileRepository extends JpaRepository<File, Long>, JpaSpecificationExecutor<File> {
+public interface FileRepository extends JpaRepository<File, Long>, JpaSpecificationExecutor<File>, FileRepositoryCustom {
     List<File> findAllByDocIdAndBranchTypeInAndListNumAndStatusNotIn(long docId, Collection<File.BranchType> branchTypes, String listNum, Collection<File.Status> status);
 
     List<File> findAllByDocIdAndBranchTypeInAndListNumAndIdNotAndStatusNotIn(long docId, Collection<File.BranchType> branchTypes, String listNum, Long id, Collection<File.Status> status);
