@@ -49,6 +49,10 @@ Ext.define('ASTD.view.main.MainMoreRejectedListViewController', {
 
     onUnfloat: function(eOpts) {
         this.fireEvent('toggleCollapse', this.getView());
+    },
+
+    onResize: function(component, width, height, oldWidth, oldHeight, eOpts) {
+        this.fireEvent('resize', width);
     }
 
 });

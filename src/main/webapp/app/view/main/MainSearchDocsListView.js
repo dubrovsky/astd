@@ -104,7 +104,8 @@ Ext.define('ASTD.view.main.MainSearchDocsListView', {
         expand: 'onExpand',
         collapse: 'onCollapse',
         unfloat: 'onUnfloat',
-        float: 'onFloat'
+        float: 'onFloat',
+        resize: 'onResize'
     },
     dockedItems: [
         {

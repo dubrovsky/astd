@@ -126,7 +126,8 @@ Ext.define('ASTD.view.main.MainMoreRejectedListView', {
         expand: 'onExpand',
         collapse: 'onCollapse',
         float: 'onFloat',
-        unfloat: 'onUnfloat'
+        unfloat: 'onUnfloat',
+        resize: 'onResize'
     },
     dockedItems: [
         {

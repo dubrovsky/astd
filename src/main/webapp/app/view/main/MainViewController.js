@@ -100,27 +100,33 @@ Ext.define('ASTD.view.main.MainViewController', {
             controller: {
                 '#mainMoreSignsListViewController': {
                     goToSelectedDoc: this.onGoToSelectedDoc,
-                    toggleCollapse: this.onToggleMoreListCollapse
+                    toggleCollapse: this.onToggleMoreListCollapse,
+                    resize: this.onResizeEastPanel
                 },
                 '#mainMoreSignsAssureListViewController': {
                     goToSelectedDoc: this.onGoToSelectedDoc,
-                    toggleCollapse: this.onToggleMoreListCollapse
+                    toggleCollapse: this.onToggleMoreListCollapse,
+                    resize: this.onResizeEastPanel
                 },
                 '#mainMoreRejectedListViewController': {
                     goToSelectedDoc: this.onGoToSelectedDoc,
-                    toggleCollapse: this.onToggleMoreListCollapse
+                    toggleCollapse: this.onToggleMoreListCollapse,
+                    resize: this.onResizeEastPanel
                 },
                 '#mainMoreApprovedListViewController': {
                     goToSelectedDoc: this.onGoToSelectedDoc,
-                    toggleCollapse: this.onToggleMoreListCollapse
+                    toggleCollapse: this.onToggleMoreListCollapse,
+                    resize: this.onResizeEastPanel
                 },
                 '#mainSearchDocsListViewController': {
                     goToSelectedDoc: this.onGoToSelectedDoc,
-                    toggleCollapse: this.onToggleMoreListCollapse
+                    toggleCollapse: this.onToggleMoreListCollapse,
+                    resize: this.onResizeEastPanel
                 },
                 '#mainSearchFilesListViewController': {
                     goToSelectedDoc: this.onGoToSelectedDoc,
-                    toggleCollapse: this.onToggleMoreListCollapse
+                    toggleCollapse: this.onToggleMoreListCollapse,
+                    resize: this.onResizeEastPanel
                 },
                 '#fileFormViewController': {
                     clickFileHistoryBtn: this.onClickFileHistoryBtn
@@ -274,8 +280,11 @@ Ext.define('ASTD.view.main.MainViewController', {
     showEastPanel: function(xtype) {
         var morelist = this.getView().lookup('morelist') || this.getView().lookup('searchlist');
         if(!morelist || !morelist.isXType(xtype, true)) {
-            var fileList = Ext.widget(xtype, {
+            var width = localStorage.getItem('eastPanelWidth');
+
+            var list = Ext.widget(xtype, {
                 region: 'east',
+                width: width ? parseInt(width) : 900,
                 viewModel: {
                     data: {
                         tree: this.lookup('catalogList')
@@ -285,7 +294,7 @@ Ext.define('ASTD.view.main.MainViewController', {
             if(morelist) {
                 this.getView().remove(morelist);
             }
-            this.getView().add(fileList);
+            this.getView().add(list);
         } else {
             morelist.toggleCollapse();
             //this.getView().updateLayout();
@@ -294,6 +303,10 @@ Ext.define('ASTD.view.main.MainViewController', {
 
     onToggleMoreListCollapse: function(panel) {
         this.getView().updateLayout();
+    },
+
+    onResizeEastPanel: function(width) {
+        localStorage.setItem('eastPanelWidth', width);
     },
 
     onClickCatalogList: function(view, record) {

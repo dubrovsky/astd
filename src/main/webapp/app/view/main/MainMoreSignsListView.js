@@ -33,7 +33,6 @@ Ext.define('ASTD.view.main.MainMoreSignsListView', {
     reference: 'morelist',
     cls: 'more-list-view',
     id: 'mainMoreSignsListView',
-    width: 900,
     collapsible: true,
     header: {
         iconCls: 'x-fa fa-list'
@@ -113,7 +112,8 @@ Ext.define('ASTD.view.main.MainMoreSignsListView', {
         expand: 'onExpand',
         collapse: 'onCollapse',
         unfloat: 'onUnfloat',
-        float: 'onFloat'
+        float: 'onFloat',
+        resize: 'onResize'
     },
     dockedItems: [
         {

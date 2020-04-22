@@ -71,6 +71,10 @@ Ext.define('ASTD.view.main.MainSearchFilesListViewController', {
             operator: 'like'
         })
         );
+    },
+
+    onResize: function(component, width, height, oldWidth, oldHeight, eOpts) {
+        this.fireEvent('resize', width);
     }
 
 });
