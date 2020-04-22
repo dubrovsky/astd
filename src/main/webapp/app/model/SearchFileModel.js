@@ -60,6 +60,10 @@ Ext.define('ASTD.model.SearchFileModel', {
         },
         {
             type: 'string',
+            name: 'branchTypeText'
+        },
+        {
+            type: 'string',
             name: 'status'
         },
         {

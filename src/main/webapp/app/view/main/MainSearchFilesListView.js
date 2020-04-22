@@ -46,7 +46,7 @@ Ext.define('ASTD.view.main.MainSearchFilesListView', {
     enableColumnMove: false,
 
     bind: {
-        selection: '{current.file}',
+        selection: '{current.searchFile}',
         store: '{searchFilesStore}'
     },
     columns: [
@@ -56,9 +56,22 @@ Ext.define('ASTD.view.main.MainSearchFilesListView', {
                 metaData.style = 'white-space:normal;';
                 return value;
             },
-            dataIndex: 'id',
             width: 150,
+            dataIndex: 'id',
             text: 'Индивидуальный <br/>номер'
+        },
+        {
+            xtype: 'gridcolumn',
+            renderer: function(value, metaData, record, rowIndex, colIndex, store, view) {
+                metaData.style = 'white-space:normal;';
+                return record.get('rootCatalogName') + ' > ' +
+                record.get('docCatalogName') + ' > ' +
+                record.get('docNum') + ' ' +
+                record.get('docDescr');
+            },
+            width: 150,
+            dataIndex: 'docCatalogName',
+            text: 'Путь'
         },
         {
             xtype: 'gridcolumn',
@@ -79,13 +92,21 @@ Ext.define('ASTD.view.main.MainSearchFilesListView', {
             xtype: 'gridcolumn',
             renderer: function(value, metaData, record, rowIndex, colIndex, store, view) {
                 metaData.style = 'white-space:normal;';
-                return value;
+                return record.get('statusText');
             },
-            flex: 1,
             defaultWidth: 132,
-            dataIndex: 'statusText',
+            dataIndex: 'status',
             tdCls: 'status_01',
             text: 'Статус'
+        },
+        {
+            xtype: 'gridcolumn',
+            renderer: function(value, metaData, record, rowIndex, colIndex, store, view) {
+                return record.get('branchTypeText');
+            },
+            defaultWidth: 132,
+            dataIndex: 'branchType',
+            text: 'Лист'
         }
     ],
     listeners: {

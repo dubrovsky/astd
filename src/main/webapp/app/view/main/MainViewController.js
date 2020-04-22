@@ -45,14 +45,14 @@ Ext.define('ASTD.view.main.MainViewController', {
 
     },
 
-    onClickFileHistoryBtn: function(view, record, fileId) {
-        Ext.Msg.wait('Свойства листа', 'Запрос данных...');
-        ASTD.model.FileModel.load(fileId, {
+    onClickFileHistoryBtn: function(view, file, fileId) {
+        Ext.Msg.wait('Свойства листа', 'Запрос данных...'); // file can be different if comes from search list
+        ASTD.model.FileModel.load(fileId, { // view canbe null if comes from search list
             scope: this,
             callback: function(record, operation, success) {
                 Ext.Msg.hide();
                 if(success){
-                    if(view.isXType('file.filehistoryformview')){
+                    if(view && view.isXType('file.filehistoryformview')){
                         view.getViewModel().set('prevFileVersion', record);
                     } else {
                         var fileHistoryForm = new ASTD.view.file.FileHistoryFormView({
@@ -65,6 +65,9 @@ Ext.define('ASTD.view.main.MainViewController', {
                         });
                         this.getView().remove(view);
                         this.getView().add(fileHistoryForm);
+                        if(this.getViewModel().get('current.file')) {
+                            this.getViewModel().set('current.file', record);
+                        }
                     }
                 }
             }
@@ -91,7 +94,7 @@ Ext.define('ASTD.view.main.MainViewController', {
                     clickDocList: this.onClickDocList
                 },
                 '#mainSearchFilesListView': {
-                    clickDocList: this.onClickDocList
+                    clickFileHistoryBtn: this.onClickFileHistoryBtn
                 }
             },
             controller: {
@@ -178,7 +181,7 @@ Ext.define('ASTD.view.main.MainViewController', {
                 Ext.Msg.hide();
                 if(success){
                     var currentCatalog = viewModel.get('current.catalog');
-                    if(!currentCatalog || doc.get('catalogId') !== currentCatalog.getId()){
+                    if(!currentCatalog || doc.get('catalogId') !== currentCatalog.getId()){ // select new catalog in tree
                         var tree = viewModel.get('tree');
                         currentCatalog = tree.getRootNode().findChildBy(function(node){
                             return node.getId() === doc.get('catalogId');
@@ -198,7 +201,13 @@ Ext.define('ASTD.view.main.MainViewController', {
 
                     this.lookup('headerRadioBranchType').setValue(branchType);
 
-                    view.fireEvent('clickDocList', this.getView().getLayout().centerRegion, viewModel.get('current.doc'));
+                    if(view.isXType('mainsearchfileslistview')){ // show selected file
+                        var searchFile = viewModel.get('current.searchFile');
+                        view.fireEvent('clickFileHistoryBtn', this.getView().getLayout().centerRegion, searchFile, searchFile.get('id'));
+                    } else { // show files for selected doc
+                        view.fireEvent('clickDocList', this.getView().getLayout().centerRegion, viewModel.get('current.doc'));
+                    }
+
                     view.collapse();
                    // view.close();
                 }

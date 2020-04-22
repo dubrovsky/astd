@@ -44,7 +44,7 @@ Ext.define('ASTD.view.main.MainSearchDocsListViewController', {
     },
 
     onGoToSelectedDocClick: function(button, e, eOpts) {
-        var record = this.getViewModel().get('current.doc');
+        var record = this.getViewModel().get('current.searchDoc');
         if(!ASTD.Utils.isSelected(record)){
             return false;
         }

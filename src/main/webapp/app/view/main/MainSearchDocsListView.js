@@ -46,7 +46,7 @@ Ext.define('ASTD.view.main.MainSearchDocsListView', {
     enableColumnMove: false,
 
     bind: {
-        selection: '{current.doc}',
+        selection: '{current.searchDoc}',
         store: '{searchDocsStore}'
     },
     columns: [

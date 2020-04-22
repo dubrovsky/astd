@@ -223,7 +223,7 @@ Ext.define('ASTD.view.main.MainView', {
                                 },
                                 {
                                     xtype: 'button',
-                                    style: 'border: 1px solid #f12222;',
+                                    style: 'border: 1px solid #333399;',
                                     iconCls: 'x-fa fa-ban',
                                     text: 'Отклоненные',
                                     bind: {

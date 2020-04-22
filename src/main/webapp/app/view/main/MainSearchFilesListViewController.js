@@ -20,7 +20,7 @@ Ext.define('ASTD.view.main.MainSearchFilesListViewController', {
     id: 'mainSearchFilesListViewController',
 
     onGoToSelectedFile: function(record) {
-        this.fireEvent('goToSelectedDoc', record.get('id'), this.getView(), record.get('branchType'));
+        this.fireEvent('goToSelectedDoc', record.get('docId'), this.getView(), record.get('branchType'));
     },
 
     onFileItemDblClick: function(dataview, record, item, index, e, eOpts) {
@@ -44,7 +44,7 @@ Ext.define('ASTD.view.main.MainSearchFilesListViewController', {
     },
 
     onGoToSelectedFileClick: function(button, e, eOpts) {
-        var record = this.getViewModel().get('current.file');
+        var record = this.getViewModel().get('current.searchFile');
         if(!ASTD.Utils.isSelected(record)){
             return false;
         }
@@ -52,7 +52,7 @@ Ext.define('ASTD.view.main.MainSearchFilesListViewController', {
     },
 
     onSearchBtnClick: function(button, e, eOpts) {
-        var searchIdVal = this.lookup('searchId').getValue().trim();
+        var searchIdVal = this.lookup('searchId').getValue(); // number
         var searchDescrVal = this.lookup('searchDescr').getValue().trim();
         if(!searchIdVal && !searchDescrVal) {
             Ext.Msg.alert('Ошибка', 'Незаполены поля для поиска');

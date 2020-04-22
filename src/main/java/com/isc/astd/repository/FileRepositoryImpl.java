@@ -42,7 +42,7 @@ public class FileRepositoryImpl implements FileRepositoryCustom {
                                         "  f.id AS id,\n" +
                                         "  f.branch_type AS branchType,\n" +
                                         "  f.status AS status,\n" +
-                                        "  f.list_num AS listNum,\n" :
+                                        "  f.list_num AS listNum\n" :
                                 " COUNT(*) AS count\n"
                         ) +
                         "FROM\n" +
@@ -54,8 +54,8 @@ public class FileRepositoryImpl implements FileRepositoryCustom {
                         "    ON cc.id = c.parent_catalog_id\n" +
                         "  JOIN catalog ccc\n" +
                         "    ON ccc.id = cc.parent_catalog_id\n" +
-                        "  JOIN `file` f\n" +
-                        "    ON f.doc_id = d.id" +
+                        "  JOIN file f\n" +
+                        "    ON f.doc_id = d.id\n" +
                         "WHERE \n" +
                         domainUtils.getFilters(filters, "f.") +
                         (!isCount ? " ORDER BY " + domainUtils.getSorts(sort, "f.last_modified_date", "desc") : ""),
@@ -80,8 +80,8 @@ public class FileRepositoryImpl implements FileRepositoryCustom {
                     tuple.get("docDescr") != null ? tuple.get("docDescr", String.class) : "",
                     tuple.get("descr") != null ? tuple.get("descr", String.class) : "",
                     ((BigInteger) tuple.get("id")).longValue(),
-                    File.BranchType.valueOf(tuple.get("branchType", String.class)),
-                    File.Status.valueOf(tuple.get("status", String.class)),
+                    File.BranchType.valueOf(tuple.get("branchType", String.class).toUpperCase()),
+                    File.Status.valueOf(tuple.get("status", String.class).toUpperCase()),
                     tuple.get("listNum") != null ? tuple.get("listNum", String.class) : "")
             ).collect(Collectors.toList());
         } else {

@@ -78,4 +78,12 @@ public class FileSearchDTO {
     public String getStatusText() {
         return status.getText();
     }
+
+    public String getBranchTypeText() {
+        return branchType.getText();
+    }
+
+    public String getListNum() {
+        return listNum;
+    }
 }
