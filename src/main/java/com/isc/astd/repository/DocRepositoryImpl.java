@@ -1,12 +1,16 @@
 package com.isc.astd.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.isc.astd.config.WebConfiguration;
 import com.isc.astd.domain.Doc;
-import com.isc.astd.domain.File;
-import com.isc.astd.service.dto.*;
+import com.isc.astd.service.dto.DocSearchDTO;
+import com.isc.astd.service.dto.MoreApprovedDTO;
+import com.isc.astd.service.dto.MoreRejectedDTO;
+import com.isc.astd.service.dto.MoreSignsDTO;
 import com.isc.astd.service.util.DomainUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.stereotype.Repository;
 
@@ -28,6 +32,8 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
 
     private final DomainUtils domainUtils;
 
+    private final Logger log = LoggerFactory.getLogger(DocRepositoryImpl.class);
+
     @Autowired
     public DocRepositoryImpl(JpaContext context, DomainUtils domainUtils) {
         this.em = context.getEntityManagerByManagedType(Doc.class);
@@ -37,8 +43,9 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T findDocsWithFilesToSign(Long nextSignPositionId, Long rootCatalogId, Integer start, Integer limit, /*Sort sort,*/String sort, boolean isCount) throws JsonProcessingException {
+        String q;
         final Query query = em.createNativeQuery(
-                "SELECT\n" +
+                q = "SELECT\n" +
                         (!isCount ?
                                 " ccc.name AS shCh,\n" +
                                         "  c.id AS catalogId,\n" +
@@ -65,7 +72,7 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
                         "  JOIN file f\n" +
                         "    ON f.doc_id = d.id\n" +
                         "    AND f.next_sign_position_id = :nextSignPositionId\n" +
-                        "    AND f.status IN ('default', 'signing')\n" +
+                        "    AND f.status IN ('default', 'signing') AND f.branch_type='default'\n" +
                         "    AND NOT EXISTS (SELECT f3.id FROM `file` f3 WHERE f3.doc_id=d.id AND f3.status = 'rejected' AND f3.branch_type = 'default')\n" +
                         "  JOIN file_position fp\n" +
                         "    ON fp.file_id = f.id\n" +
@@ -95,7 +102,7 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
                         "        AND rp2.order = fp2.order + 1\n" +
                         "        AND rp2.status != 'assure'\n" +
                         "    WHERE f2.next_sign_position_id = :nextSignPositionId\n" +
-                        "      AND f2.status IN ('default', 'signing')\n" +
+                        "      AND f2.status IN ('default', 'signing') AND f2.branch_type='default'\n" +
                         "    GROUP BY f2.doc_id) ff\n" +
                         "    ON ff.doc_id = d.id\n" +
                         "    AND ff.max_date = fp.last_modified_date \n" +
@@ -106,6 +113,9 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
         if (rootCatalogId != null) {
             query.setParameter("rootCatalogId", rootCatalogId);
         }
+
+//        log.debug(q);
+
 
         T result;
         if (!isCount) {
@@ -163,7 +173,7 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
                         "  JOIN `file` f\n" +
                         "    ON f.doc_id = d.id\n" +
                         "    AND f.next_sign_position_id = :nextSignPositionId\n" +
-                        "    AND f.status IN ('default', 'signing')\n" +
+                        "    AND f.status IN ('default', 'signing') AND f.branch_type='default'\n" +
                         "    AND NOT EXISTS (SELECT f3.id FROM `file` f3 WHERE f3.doc_id=d.id AND f3.status = 'rejected' AND f3.branch_type = 'default')\n" +
                         "  JOIN file_position fp\n" +
                         "    ON fp.file_id = f.id\n" +
@@ -193,7 +203,7 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
                         "        AND rp2.order = fp2.order + 1\n" +
                         "        AND rp2.status = 'assure'\n" +
                         "    WHERE f2.next_sign_position_id = :nextSignPositionId\n" +
-                        "      AND f2.status IN ('default', 'signing')\n" +
+                        "      AND f2.status IN ('default', 'signing') AND f2.branch_type='default'\n" +
                         "    GROUP BY f2.doc_id) ff\n" +
                         "    ON ff.doc_id = d.id\n" +
                         "    AND ff.max_date = fp.last_modified_date \n" +
@@ -315,9 +325,9 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T findDocsWithRejectedFiles(Long positionId, Long rootCatalogId, Integer start, Integer limit, String sort, boolean isCount) throws JsonProcessingException {
-
+        String q = null;
         final Query query = em.createNativeQuery(
-                "SELECT\n" +
+                q = "SELECT\n" +
                         (!isCount ?
                                 "  ccc.name AS shCh,\n" +
                                         "  c.id AS catalogId,\n" +
@@ -369,8 +379,7 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
                         "        FROM\n" +
                         "          route_position rp2\n" +
                         "        WHERE rp2.route_id = f2.route_id\n" +
-                        "          AND rp2.position_id = :positionId\n" +
-                        "          AND rp2.order = fp2.order)\n" +
+                        "          AND rp2.position_id = :positionId)\n" +
                         "    WHERE f2.status = 'rejected'\n" +
                         "      AND f2.branch_type = 'default'\n" +
                         "    GROUP BY f2.doc_id) ff\n" +
@@ -379,6 +388,8 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
                         (!isCount ? " ORDER BY " + domainUtils.getSorts(sort, "dateSign", "desc") : "")
                 , Tuple.class
         );
+
+//        log.debug(q);
 
         query.setParameter("positionId", positionId);
         if (rootCatalogId != null) {
@@ -433,7 +444,7 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
                                         "    COUNT(*)\n" +
                                         "  FROM\n" +
                                         "    file ff\n" +
-                                        "  WHERE ff.doc_id = d.id\n" +
+                                        "  WHERE ff.doc_id = d.id AND ff.route_id IN (1, 2, 5)\n" +
                                         "    AND ff.branch_type = 'approved') AS listCount\n" :
                                 " COUNT(*) AS count\n"
                         ) +
@@ -447,14 +458,14 @@ public class DocRepositoryImpl implements DocRepositoryCustom {
                         "  JOIN catalog ccc\n" +
                         "    ON ccc.id = cc.parent_catalog_id\n" +
                         "  JOIN file f\n" +
-                        "    ON f.doc_id = d.id\n" +
+                        "    ON f.doc_id = d.id AND f.route_id IN (1, 2, 5)\n" +
                         "    AND f.branch_type = 'approved'\n" +
                         "    AND f.last_modified_date =\n" +
                         "    (SELECT\n" +
                         "      MAX(f2.last_modified_date)\n" +
                         "    FROM\n" +
                         "      file f2\n" +
-                        "    WHERE f2.doc_id = f.doc_id\n" +
+                        "    WHERE f2.doc_id = f.doc_id AND f2.route_id IN (1, 2, 5)\n" +
                         "      AND f2.branch_type = 'approved')\n" +
                         "  JOIN file_position fp\n" +
                         "    ON fp.file_id = f.id\n" +

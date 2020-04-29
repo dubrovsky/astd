@@ -1,11 +1,6 @@
 package com.isc.astd.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.isc.astd.service.dto.DocSearchDTO;
-import com.isc.astd.service.dto.FilterDTO;
-import org.springframework.data.domain.Sort;
-
-import java.util.List;
 
 /**
  * @author p.dzeviarylin
