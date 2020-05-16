@@ -18,5 +18,6 @@ Backend:
 - Maven
 
 Frontend:
-- Sencha Ext JS 6.7
+- Sencha Ext JS 7.2
 - Sencha Architect
+- Sencha Cmd
