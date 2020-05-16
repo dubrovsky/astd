@@ -55,6 +55,7 @@ Ext.define('ASTD.view.file.FileFormView', {
                     fieldLabel: 'Лист',
                     name: 'file',
                     allowBlank: false,
+                    vtype: 'fileSize',
                     buttonText: 'Выбрать...'
                 },
                 {

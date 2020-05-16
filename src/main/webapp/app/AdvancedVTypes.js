@@ -23,5 +23,14 @@ Ext.define('ASTD.AdvancedVTypes', {
         return true;
     },
 
-    listNumText: 'Лист с таким номером уже существует.'
+    listNumText: 'Лист с таким номером уже существует.',
+
+    fileSize: function (value, field) {
+        if (!value) {
+            return true;
+        }
+        return field.fileInputEl.dom.files[0].size <= (5 * 1024 * 1024);
+    },
+
+    fileSizeText: 'Максимальный размер файла 5МБ.',
 });

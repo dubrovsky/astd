@@ -80,9 +80,17 @@ Ext.define('ASTD.view.file.FileHistoryFormViewModel', {
             if(!file) {
                 return '';
             }
-            return file.get('contentType').indexOf('/pdf') !== -1 ?
-            '<embed src="' + file.getProxy().getUrl() + '/view/' + file.getId() +  '" width="100%" height="600">' :
-            '<b>Просмотр доступен только для pdf</b>';
+
+            var result;
+            if(file.get('contentType').indexOf('/pdf') !== -1) {
+                result = '<embed src="' + file.getProxy().getUrl() + '/view/' + file.getId() +  '" width="100%" height="600">';
+            } else if(file.get('contentType').indexOf('image/') !== -1) {
+                result = '<img src="' + file.getProxy().getUrl() + '/view/' + file.getId() +  '" width="100%" alt="Предпросмотр изображений">';
+            } else {
+                result = '<b>Просмотр доступен только для pdf, image</b>';
+            }
+
+            return result;
         },
         isOriginalCheckedHidden: function(get) {
             var file = get('prevFileVersion');
