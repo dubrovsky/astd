@@ -51,15 +51,11 @@ Ext.define('ASTD.view.file.FileListViewController', {
     onViewEcpPersonsBtnClick: function(button, e, eOpts) {
         var rec = button.getWidgetRecord();
         this.fireEvent('viewEcpPersonsBtnClick', this.getView(), rec);
-        /* var win = new ASTD.view.file.FileEcpPersonsListView({
-        viewModel: {
-        stores: {
-        ecpPersonsStore: rec.ecpPersons()
-        }
-        }
-        });
+    },
 
-        win.show(); */
+    onViewEcpReviewPersonsBtnClick: function(button, e, eOpts) {
+        var rec = button.getWidgetRecord();
+        this.fireEvent('viewEcpReviewPersonsBtnClick', rec);
     },
 
     onBackToDocsBtnClick: function(button, e, eOpts) {
@@ -90,7 +86,7 @@ Ext.define('ASTD.view.file.FileListViewController', {
             return false;
         }
 
-        this.fireEvent('viewFileBtnClick', currentFile, this.getView(), true);
+        this.fireEvent('viewFileBtnClick', currentFile, this.getView());
         // this.onView(currentFile);
     },
 
@@ -106,7 +102,40 @@ Ext.define('ASTD.view.file.FileListViewController', {
         }
 
 
-        this.fireEvent('downloadFileBtnClick', currentFile, this.getView(), false);
+        this.fireEvent('downloadFileBtnClick', currentFile, this.getView());
+    },
+
+    onCompareBtnClick: function(button, e, eOpts) {
+
+        var currentFile = this.getView().getSelection()[0];
+        if(!ASTD.Utils.isSelected(currentFile)){
+            return false;
+        }
+
+
+        this.fireEvent('compareFileBtnClick', currentFile, this.getView());
+    },
+
+    onChangeRouteBtnClick: function(button, e, eOpts) {
+
+        var currentFile = this.getView().getSelection()[0];
+        if(!ASTD.Utils.isSelected(currentFile)){
+            return false;
+        }
+        var win = new ASTD.view.file.FileChangeRouteFormView({
+            viewModel: {
+                data: {
+                    currentFile: currentFile,
+                    fileList: this.getView()
+                }
+            }
+        });
+
+        win.getViewModel().getStore('routeStore').load({
+            params: {routeId: currentFile.get('routeId')}
+        });
+
+        win.show();
     },
 
     onDeleteBtnClick: function(button, e, eOpts) {

@@ -39,6 +39,26 @@ Ext.define('ASTD.view.file.FileListViewModel', {
             isHidden = user.get('positionId') !== 9 && user.get('positionId') !== 5;
             return isHidden;
         },
+        isCompareBtnHidden: function(get) {
+            var file = get('current.file');
+            var user = this.get('current.user');
+            if(!file || !user) {
+                return true;
+            }
+
+
+            return !file.get('canBeCompared');
+        },
+        isChangeRouteBtnHidden: function(get) {
+            var file = get('current.file');
+            var user = this.get('current.user');
+            if(!file || !user) {
+                return true;
+            }
+
+
+            return false;
+        },
         isDeleteBtnHidden: function(get) {
             var file = get('current.file');
             var user = this.get('current.user');
@@ -125,6 +145,14 @@ Ext.define('ASTD.view.file.FileListViewModel', {
             isHidden = file.get('branchType') !== 'ARCHIVE' || user.get('positionId') !== 5 || file.get('hasNextVersion');
 
             return isHidden;
+        },
+        isSignedReviewColumnHidden: function(get) {
+            var branchType = get('current.branchType');
+            var user = this.get('current.user');
+            if(!branchType || !user) {
+                return true;
+            }
+            return branchType !== 'APPROVED';
         }
     }
 

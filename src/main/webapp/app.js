@@ -35,7 +35,8 @@ Ext.application({
         'MoreSignsAssureModel',
         'MoreApprovedModel',
         'SearchDocModel',
-        'SearchFileModel'
+        'SearchFileModel',
+        'EcpReviewPersonModel'
     ],
     views: [
         'main.MainView',
@@ -58,7 +59,9 @@ Ext.application({
         'main.MainMoreRejectedListView',
         'main.MainMoreSignsAssureListView',
         'main.MainSearchDocsListView',
-        'main.MainSearchFilesListView'
+        'main.MainSearchFilesListView',
+        'file.FileEcpReviewPersonsListView',
+        'file.FileChangeRouteFormView'
     ],
     name: 'ASTD',
 

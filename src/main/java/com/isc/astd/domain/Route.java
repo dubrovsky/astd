@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.HashSet;
@@ -33,6 +34,10 @@ public class Route extends AbstractBaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "position_id")
 	private Position position;
+
+    @NotNull
+    @Column(name = "review", nullable = false)
+    private boolean review = false;
 
     @JsonIgnore
     @BatchSize(size = 50)
@@ -98,4 +103,12 @@ public class Route extends AbstractBaseEntity {
 	public void setExpiredDate(Instant expiredDate) {
 		this.expiredDate = expiredDate;
 	}
+
+    public boolean isReview() {
+        return review;
+    }
+
+    public void setReview(boolean review) {
+        this.review = review;
+    }
 }

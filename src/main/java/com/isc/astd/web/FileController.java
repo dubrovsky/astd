@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author p.dzeviarylin
@@ -61,13 +62,13 @@ public class FileController {
     }
 
     @DeleteMapping("/file/{id}")
-    public ResponseEntity deleteFile(@PathVariable("id") long id, @AuthenticationPrincipal User user) throws IOException {
+    public ResponseEntity<Void> deleteFile(@PathVariable("id") long id, @AuthenticationPrincipal User user) throws IOException {
         fileService.deleteFile(id, user);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/file/rejected/{id}")
-    public ResponseEntity deleteRejectedFile(@PathVariable("id") long id, @AuthenticationPrincipal User user) throws IOException {
+    public ResponseEntity<Void> deleteRejectedFile(@PathVariable("id") long id, @AuthenticationPrincipal User user) throws IOException {
         fileService.deleteRejectedFile(id, user);
         return ResponseEntity.ok().build();
     }
@@ -77,7 +78,15 @@ public class FileController {
         if (!fileService.checkAllFileEcpsAndUpdate(fileId, user.getUsername(), null)) {
             throw new EcpException("Подпись не верна");
         }
-        return getFileContent(fileId, "inline");
+        return getFileContent(fileService.viewFile(fileId), "inline");
+    }
+
+    @GetMapping("/file/compare/{fileId}")
+    public ResponseEntity<byte[]> compareFile(@PathVariable("fileId") long fileId, @AuthenticationPrincipal User user) throws Exception {
+        if (!fileService.checkAllFileEcpsAndUpdate(fileId, user.getUsername(), null)) {
+            throw new EcpException("Подпись не верна");
+        }
+        return getFileContent(fileService.compareFile(fileId), "inline");
     }
 
     @GetMapping("/file/download/{fileId}")
@@ -85,7 +94,7 @@ public class FileController {
         if (!fileService.checkAllFileEcpsAndUpdate(fileId, user.getUsername(), null)) {
             throw new EcpException("Подпись не верна");
         }
-        return getFileContent(fileId, "attachment");
+        return getFileContent(fileService.viewFile(fileId), "attachment");
     }
 
     @GetMapping("/file/check/ecp/{fileId}")
@@ -95,25 +104,39 @@ public class FileController {
         return isValid ? ResponseEntity.ok().body(new Response<>(file)) : ResponseEntity.badRequest().body(new Response<>(file, "Подпись не верна", false, true));
     }
 
-    private ResponseEntity<byte[]> getFileContent(long id, String attachType) throws IOException {
-        FileViewDTO file = fileService.viewFile(id);
+    private ResponseEntity<byte[]> getFileContent(FileViewDTO file, String attachType) throws IOException {
+//        FileViewDTO file = fileService.viewFile(id);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentLength(file.getSize());
         headers.set(HttpHeaders.CONTENT_TYPE, file.getContentType());
-//        headers.set(HttpHeaders.CONTENT_DISPOSITION, attachType + "; filename=" + URLEncoder.encode(file.getName(), "UTF-8"));
-        headers.set(HttpHeaders.CONTENT_DISPOSITION, attachType + "; filename=" + URLEncoder.encode(fileService.generateFileName(file.getId()), "UTF-8"));
+        headers.set(
+                HttpHeaders.CONTENT_DISPOSITION,
+                attachType + "; filename=" + URLEncoder.encode(file.getId() != null ? fileService.generateFileName(file.getId()) : file.getName(), "UTF-8")
+        );
         return ResponseEntity.ok().headers(headers).body(file.getFile());
     }
 
-    @GetMapping("/file/ecp")
-    public ResponseEntity<Response<EcpHashDTO>> getEcpData(@RequestParam("id") long fileId, @AuthenticationPrincipal User principal) throws Exception {
+    @GetMapping("/file/ecp/{id}")
+    public ResponseEntity<Response<EcpHashDTO>> getEcpData(@PathVariable("id") long fileId, @AuthenticationPrincipal User principal) throws Exception {
         EcpHashDTO ecpDTO = fileService.getEcpData(fileId, principal.getUsername());
+        return ResponseEntity.ok(new Response<>(ecpDTO));
+    }
+
+    @GetMapping("/file/ecp/review/{id}")
+    public ResponseEntity<Response<EcpHashDTO>> getEcpReviewData(@PathVariable("id") long fileId, @AuthenticationPrincipal User principal) throws Exception {
+        EcpHashDTO ecpDTO = fileService.getEcpReviewData(fileId, principal.getUsername());
         return ResponseEntity.ok(new Response<>(ecpDTO));
     }
 
     @PostMapping("/file/ecp/{id}")
     public ResponseEntity<Response<EcpHashDTO>> saveEcp(EcpDTO ecp, @PathVariable("id") long fileId, @AuthenticationPrincipal User principal) throws Exception {
         fileService.saveEcp(fileId, principal, ecp);
+        return ResponseEntity.ok(new Response<>());
+    }
+
+    @PostMapping("/file/ecp/review/{id}")
+    public ResponseEntity<Response<EcpHashDTO>> saveEcpReview(EcpDTO ecp, @PathVariable("id") long fileId, @AuthenticationPrincipal User principal) throws Exception {
+        fileService.saveEcpReview(fileId, principal, ecp);
         return ResponseEntity.ok(new Response<>());
     }
 
@@ -142,8 +165,8 @@ public class FileController {
     }
 
     @GetMapping("/file/history/{direction}/{id}")
-    public ResponseEntity<Response<FileBaseDTO>> getVersion(@PathVariable("id") long fileId, @PathVariable("direction") String direction, @AuthenticationPrincipal User principal) {
-        FileBaseDTO fileDTO = fileService.getVersion(fileId, direction, principal);
+    public ResponseEntity<Response<FileBaseDTO>> getPrevOrNextFileVersion(@PathVariable("id") long fileId, @PathVariable("direction") String direction, @AuthenticationPrincipal User principal) {
+        FileBaseDTO fileDTO = fileService.getPrevOrNextFileVersion(fileId, direction, principal);
         return ResponseEntity.ok(new Response<>(fileDTO));
     }
 
@@ -154,13 +177,13 @@ public class FileController {
     }
 
     @PostMapping("/file/paper/{id}")
-    public ResponseEntity<Response> savePaperChange(@PathVariable("id") long fileId, @RequestParam("value") boolean value, @RequestParam("field") String fieldName) {
+    public ResponseEntity<Response<?>> savePaperChange(@PathVariable("id") long fileId, @RequestParam("value") boolean value, @RequestParam("field") String fieldName) {
         fileService.savePaperChange(fileId, value, fieldName);
         return ResponseEntity.ok(new Response<>());
     }
 
     @PostMapping("/file/originalchecked/{id}")
-    public ResponseEntity<Response> saveOriginalChecked(@PathVariable("id") long fileId,
+    public ResponseEntity<Response<?>> saveOriginalChecked(@PathVariable("id") long fileId,
                                                         @RequestParam("fioSign1") String fioSign1, @RequestParam("fioSign2") String fioSign2,
                                                         @RequestParam("dateSign1") LocalDate dateSign1, @RequestParam("dateSign2") LocalDate dateSign2) {
         fileService.saveOriginalChecked(fileId, fioSign1, fioSign2, dateSign1, dateSign2);
@@ -168,13 +191,13 @@ public class FileController {
     }
 
     @PostMapping("/file/theme/{id}")
-    public ResponseEntity<Response> saveTheme(@PathVariable("id") long fileId, @RequestParam("theme") String theme) {
+    public ResponseEntity<Response<?>> saveTheme(@PathVariable("id") long fileId, @RequestParam("theme") String theme) {
         fileService.saveTheme(fileId, theme);
         return ResponseEntity.ok(new Response<>());
     }
 
     @PostMapping("/file/note/{id}")
-    public ResponseEntity<Response> saveNote(@PathVariable("id") long fileId, @RequestParam("note") String note) {
+    public ResponseEntity<Response<?>> saveNote(@PathVariable("id") long fileId, @RequestParam("note") String note) {
         fileService.saveNote(fileId, note);
         return ResponseEntity.ok(new Response<>());
     }
@@ -183,5 +206,17 @@ public class FileController {
     public ResponseEntity<Response<FileSearchDTO>> searchFiles(DomainPageParamsDTO domainPageParamsDTO, @AuthenticationPrincipal User user) throws IOException {
         PageRequestDTO<FileSearchDTO> searchFiles = fileService.searchFiles(domainPageParamsDTO, user);
         return ResponseEntity.ok(new Response<>(searchFiles.getContent(), searchFiles.getTotalElements()));
+    }
+
+    @GetMapping("/ecpreviewperson")
+    public ResponseEntity<Response<EcpReviewPersonDTO>> getEcpReviewPersons(@RequestParam("fileId") long fileId) {
+        List<EcpReviewPersonDTO> ecpReviewPerson = fileService.getEcpReviewPersons(fileId);
+        return ResponseEntity.ok(new Response<>(ecpReviewPerson));
+    }
+
+    @PostMapping("/file/change-route/{fileId}/{routeId}")
+    public ResponseEntity<Response<Void>> changeRoute(@PathVariable("fileId") long fileId, @PathVariable("routeId") long routeId, @AuthenticationPrincipal User principal) throws Exception {
+//        fileService.changeRoute(fileId, routeId);
+        return ResponseEntity.ok(new Response<>());
     }
 }

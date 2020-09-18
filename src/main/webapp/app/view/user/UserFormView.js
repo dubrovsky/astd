@@ -52,6 +52,7 @@ Ext.define('ASTD.view.user.UserFormView', {
                     fieldLabel: 'Id',
                     allowBlank: false,
                     bind: {
+                        hidden: '{showPersonalDataOnly}',
                         value: '{currentUser.id}'
                     }
                 },
@@ -60,28 +61,31 @@ Ext.define('ASTD.view.user.UserFormView', {
                     anchor: '100%',
                     fieldLabel: 'ФИО',
                     bind: {
+                        hidden: '{showPersonalDataOnly}',
                         value: '{currentUser.name}'
                     }
                 },
                 {
                     xtype: 'textfield',
                     anchor: '100%',
-                    fieldLabel: 'Организация',
+                    fieldLabel: 'Должность',
                     allowBlank: false,
                     bind: {
+                        hidden: '{showPersonalDataOnly}',
                         value: '{currentUser.organization}'
                     }
                 },
                 {
                     xtype: 'combobox',
                     anchor: '100%',
-                    fieldLabel: 'Каталог',
+                    fieldLabel: 'Подразделение',
                     editable: false,
                     displayField: 'name',
                     forceSelection: true,
                     queryMode: 'local',
                     valueField: 'id',
                     bind: {
+                        hidden: '{showPersonalDataOnly}',
                         value: '{currentUser.rootCatalogId}',
                         store: '{catalogStore}'
                     }
@@ -89,7 +93,7 @@ Ext.define('ASTD.view.user.UserFormView', {
                 {
                     xtype: 'combobox',
                     anchor: '100%',
-                    fieldLabel: 'Должность',
+                    fieldLabel: 'Уровень доступа',
                     allowBlank: false,
                     editable: false,
                     displayField: 'name',
@@ -97,8 +101,26 @@ Ext.define('ASTD.view.user.UserFormView', {
                     queryMode: 'local',
                     valueField: 'id',
                     bind: {
+                        hidden: '{showPersonalDataOnly}',
                         value: '{currentUser.positionId}',
                         store: '{positionStore}'
+                    }
+                },
+                {
+                    xtype: 'textfield',
+                    anchor: '100%',
+                    fieldLabel: 'Телефон',
+                    bind: {
+                        value: '{currentUser.phone}'
+                    }
+                },
+                {
+                    xtype: 'textfield',
+                    anchor: '100%',
+                    fieldLabel: 'Эл. почта',
+                    vtype: 'email',
+                    bind: {
+                        value: '{currentUser.email}'
                     }
                 }
             ]

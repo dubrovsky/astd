@@ -50,6 +50,15 @@ public class Position extends AbstractBaseEntity {
     )
     private Set<FilePosition> filePositions = new HashSet<>();
 
+    @JsonIgnore
+    @BatchSize(size = 50)
+    @OneToMany(
+            mappedBy = "position",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<FileReview> fileReviews = new HashSet<>();
+
 	@JsonIgnore
 	@BatchSize(size = 50)
 	@OneToMany(
@@ -130,4 +139,12 @@ public class Position extends AbstractBaseEntity {
 	public void setRoutes(Set<Route> routes) {
 		this.routes = routes;
 	}
+
+    public Set<FileReview> getFileReviews() {
+        return fileReviews;
+    }
+
+    public void setFileReviews(Set<FileReview> fileReviews) {
+        this.fileReviews = fileReviews;
+    }
 }

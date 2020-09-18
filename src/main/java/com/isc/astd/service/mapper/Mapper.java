@@ -44,6 +44,7 @@ public class Mapper extends ConfigurableMapper {
                 .field("doc.id", "docId")
                 .field("nextSignPosition.id", "nextSignPositionId")
                 .fieldAToB("route.id", "routeId")
+                .fieldAToB("route.review", "routeReview")
                 .fieldAToB("route.name", "routeName")
                 .fieldAToB("route.position.id", "routePositionId")
                 .fieldAToB("id", "id")

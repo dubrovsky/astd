@@ -124,6 +124,23 @@ Ext.define('ASTD.view.file.FileListView', {
                     click: 'onViewEcpPersonsBtnClick'
                 }
             }
+        },
+        {
+            xtype: 'widgetcolumn',
+            dataIndex: 'signedReview',
+            text: 'Сверено',
+            bind: {
+                hidden: '{isSignedReviewColumnHidden}'
+            },
+            widget: {
+                xtype: 'button',
+                bind: {
+                    hidden: '{!record.signedReview}'
+                },
+                listeners: {
+                    click: 'onViewEcpReviewPersonsBtnClick'
+                }
+            }
         }
     ],
     viewConfig: {
@@ -179,6 +196,28 @@ Ext.define('ASTD.view.file.FileListView', {
                     text: 'Выгрузить',
                     listeners: {
                         click: 'onDownloadBtnClick'
+                    }
+                },
+                {
+                    xtype: 'button',
+                    iconCls: 'x-fa fa-images',
+                    text: 'Сравнить',
+                    bind: {
+                        hidden: '{isCompareBtnHidden}'
+                    },
+                    listeners: {
+                        click: 'onCompareBtnClick'
+                    }
+                },
+                {
+                    xtype: 'button',
+                    iconCls: 'x-fa fa-exchange-alt',
+                    text: 'Сменить маршрут',
+                    bind: {
+                        hidden: '{isChangeRouteBtnHidden}'
+                    },
+                    listeners: {
+                        click: 'onChangeRouteBtnClick'
                     }
                 },
                 {

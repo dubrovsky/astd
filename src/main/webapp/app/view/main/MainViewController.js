@@ -138,24 +138,32 @@ Ext.define('ASTD.view.main.MainViewController', {
                     clickDocList: this.onClickDocList,
                     viewFileBtnClick: this.onFileView,
                     downloadFileBtnClick: this.onDownloadFileBtnClick,
+                    compareFileBtnClick: this.onCompareFileBtnClick,
                     clickFileHistoryBtn: this.onClickFileHistoryBtn,
-                    viewEcpPersonsBtnClick: this.onViewEcpPersonsBtnClick
+                    viewEcpPersonsBtnClick: this.onViewEcpPersonsBtnClick,
+                    viewEcpReviewPersonsBtnClick: this.onViewEcpReviewPersonsBtnClick
                 },
                 '#fileListViewController': {
                     viewFileBtnClick: this.onFileView,
                     downloadFileBtnClick: this.onDownloadFileBtnClick,
-                    viewEcpPersonsBtnClick: this.onViewEcpPersonsBtnClick
+                    compareFileBtnClick: this.onCompareFileBtnClick,
+                    viewEcpPersonsBtnClick: this.onViewEcpPersonsBtnClick,
+                    viewEcpReviewPersonsBtnClick: this.onViewEcpReviewPersonsBtnClick
                 }
             }
         });
     },
 
-    onFileView: function(currentFile, view, isFileView) {
-                this.fileViewOrDownload(currentFile, view, isFileView);
+    onFileView: function(currentFile, view ) {
+                this.fileViewOrDownload(currentFile, view, "view");
     },
 
-    onDownloadFileBtnClick: function(currentFile, view, isFileView) {
-        this.fileViewOrDownload(currentFile, view, isFileView);
+    onDownloadFileBtnClick: function(currentFile, view ) {
+        this.fileViewOrDownload(currentFile, view, "download");
+    },
+
+    onCompareFileBtnClick: function(currentFile, view ) {
+        this.fileViewOrDownload(currentFile, view, "compare");
     },
 
     onViewEcpPersonsBtnClick: function(view, record) {
@@ -167,6 +175,12 @@ Ext.define('ASTD.view.main.MainViewController', {
             }
         });
 
+        win.show();
+    },
+
+    onViewEcpReviewPersonsBtnClick: function(record) {
+        var win = new ASTD.view.file.FileEcpReviewPersonsListView();
+        win.getViewModel().getStore('ecpReviewPersonsStore').load({params: {fileId: record.get('id')}});
         win.show();
     },
 
@@ -222,7 +236,7 @@ Ext.define('ASTD.view.main.MainViewController', {
         });
     },
 
-    fileViewOrDownload: function(currentFile, view, isFileView) {
+    fileViewOrDownload: function(currentFile, view, action) {
         var fileUrl = currentFile.getProxy().getUrl();
                 view.setLoading(true);
                 Ext.Ajax.request({
@@ -246,9 +260,13 @@ Ext.define('ASTD.view.main.MainViewController', {
 
                         // if (responseText.success) {
                         if (success) {
-                            if(isFileView) {
-                                var win = window.open('', '_blank');
-                                win.location = fileUrl + '/view/' + currentFile.getId();
+                            if(action === 'view' || action === 'compare') {
+                                var win = window.open(fileUrl + '/' + action + '/' + currentFile.getId(), '_blank');
+                                // win.document.body.style.background = 'white';
+                                // win.location = fileUrl + '/' + action + '/' + currentFile.getId();
+                                win.addEventListener("load", function(){
+                                    win.document.body.style.backgroundColor = "white";
+                                });
                                 win.focus();
                             } else {
                                 if(Ext.fly('downloadIframe')){
@@ -411,6 +429,19 @@ Ext.define('ASTD.view.main.MainViewController', {
                 }
             }
         });
+    },
+
+    onHeaderUserClick: function(component) {
+        var win = new ASTD.view.user.UserFormView({
+            viewModel: {
+                data: {
+                    currentUser: this.getViewModel().get('current.user'),
+                    showPersonalDataOnly: true
+                }
+            }
+        });
+
+        win.show();
     },
 
     onChangeBranchType: function(field, newValue, oldValue, eOpts) {

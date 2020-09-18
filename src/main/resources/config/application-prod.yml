@@ -1,12 +1,12 @@
 spring:
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
-#        url: jdbc:mysql://10.50.100.110:3306/labdoc?useUnicode=true&characterEncoding=utf8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Europe/Moscow
-        url: jdbc:mysql://localhost:3306/labdoc?useUnicode=true&characterEncoding=utf8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Europe/Moscow
-#        username: labdoc
-        username: root
-#        password: dSy3nKkfiz
-        password: 66669801
+        url: jdbc:mysql://10.50.100.110:3306/labdoc?useUnicode=true&characterEncoding=utf8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Europe/Moscow
+#        url: jdbc:mysql://localhost:3306/labdoc?useUnicode=true&characterEncoding=utf8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Europe/Moscow
+        username: labdoc
+#        username: root
+        password: dSy3nKkfiz
+#        password: 66669801
         hikari:
             data-source-properties:
                 cachePrepStmts: true

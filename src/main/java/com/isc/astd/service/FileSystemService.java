@@ -134,4 +134,8 @@ public class FileSystemService {
         Files.createDirectories(targetPath);
         Files.copy(getFilePath(srcFile.getName(), srcFile.getId(), srcFile.getDoc()), getFilePath(destFile.getName(), destFile.getId(), destFile.getDoc()));
     }
+
+    public String removeExtension(Path filePath) {
+        return filePath.normalize().getFileName().toString().replaceFirst("[.][^.]+$", "");
+    }
 }

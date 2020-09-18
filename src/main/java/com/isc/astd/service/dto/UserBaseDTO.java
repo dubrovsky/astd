@@ -17,6 +17,8 @@ public class UserBaseDTO {
 	private String organization;
 	@JsonFormat(pattern = "dd.MM.yyyy", timezone = "GMT+3")
 	private LocalDate expiredDate;
+    private String phone;
+    private String email;
 
 	public String getId() {
 		return id;
@@ -82,4 +84,20 @@ public class UserBaseDTO {
 	public void setPrevId(String prevId) {
 		this.prevId = prevId;
 	}
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }

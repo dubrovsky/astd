@@ -374,10 +374,23 @@ Ext.define('ASTD.view.file.FileHistoryFormView', {
         },
         {
             xtype: 'button',
+            style: 'margin: 10px 10px 10px 10px;',
             iconCls: 'x-fa fa-signature',
             text: 'Подписи',
             listeners: {
                 click: 'onViewEcpPersonsBtnClick'
+            }
+        },
+        {
+            xtype: 'button',
+            style: 'margin: 10px 10px 10px 10px;',
+            iconCls: 'x-fa fa-file-signature',
+            text: 'Сверено',
+            bind: {
+                hidden: '{isSignsReviewBtnHidden}'
+            },
+            listeners: {
+                click: 'onViewEcpReviewPersonsBtnClick'
             }
         },
         {
@@ -463,6 +476,28 @@ Ext.define('ASTD.view.file.FileHistoryFormView', {
                     },
                     listeners: {
                         click: 'onSignBtnClick'
+                    }
+                },
+                {
+                    xtype: 'button',
+                    iconCls: 'x-fa fa-pen-alt',
+                    text: 'Сверить',
+                    bind: {
+                        hidden: '{isSignReviewBtnHidden}'
+                    },
+                    listeners: {
+                        click: 'onSignReviewBtnClick'
+                    }
+                },
+                {
+                    xtype: 'button',
+                    iconCls: 'x-fa fa-images',
+                    text: 'Сравнить',
+                    bind: {
+                        hidden: '{isCompareBtnHidden}'
+                    },
+                    listeners: {
+                        click: 'onCompareBtnClick'
                     }
                 },
                 {

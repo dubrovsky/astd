@@ -1,6 +1,7 @@
 package com.isc.astd.domain;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
@@ -25,6 +26,15 @@ public class User extends AbstractAuditingEntity {
     @Size(max = 48)
     @Column(name = "organization", length = 48)
     private String organization;
+
+    @Size(max = 24)
+    @Column(name = "phone", length = 24)
+    private String phone;
+
+    @Size(max = 24)
+    @Email
+    @Column(name = "email", length = 24)
+    private String email;
 
     @Column(name = "expired_date")
     private LocalDate expiredDate;
@@ -115,5 +125,21 @@ public class User extends AbstractAuditingEntity {
 
     public void setRootCatalog(Catalog rootCatalog) {
         this.rootCatalog = rootCatalog;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

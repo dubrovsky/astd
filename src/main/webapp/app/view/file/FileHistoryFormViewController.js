@@ -23,7 +23,7 @@ Ext.define('ASTD.view.file.FileHistoryFormViewController', {
         var currentFile = this.getViewModel().get('prevFileVersion');
         Ext.Msg.wait('Подпись', 'Сохранение данных...');
         Ext.Ajax.request({
-            url: currentFile.getProxy().getUrl() + '/ecp/' + currentFile.getId(),
+            url: currentFile.getProxy().getUrl() + this.getViewModel().get('urlSuffix') + currentFile.getId(),
             method: 'POST',
             params: {ecp: ecp},
             scope: this,
@@ -37,10 +37,8 @@ Ext.define('ASTD.view.file.FileHistoryFormViewController', {
                         align: 'tr',
                         bodyPadding: 10
                     });
-                    // Ext.Msg.wait("Загрузка", "Загрузка формы");
                     this.fireEvent('clickFileHistoryBtn', this.getView(),
-                                   this.getViewModel().get('prevFileVersion'), this.getViewModel().get('prevFileVersion').get('id'));
-                    // this.getView().getStore().reload();
+                        this.getViewModel().get('prevFileVersion'), this.getViewModel().get('prevFileVersion').get('id'));
                 } else {
                     Ext.Msg.show({
                         title: 'Ошибка',
@@ -50,10 +48,8 @@ Ext.define('ASTD.view.file.FileHistoryFormViewController', {
                         scope: this,
                         fn: function(btn) {
                             if(btn === 'ok') {
-                              //  Ext.Msg.wait("Загрузка", "Загрузка формы");
                                 this.fireEvent('clickFileHistoryBtn', this.getView(),
                                                this.getViewModel().get('prevFileVersion'), this.getViewModel().get('prevFileVersion').get('id'));
-                                // this.getView().getStore().reload();
                             }
                         }
                     });
@@ -92,6 +88,53 @@ Ext.define('ASTD.view.file.FileHistoryFormViewController', {
                 }
             }
         });
+    },
+
+    signFile: function(urlSuffix) {
+                var currentFile = this.getViewModel().get('prevFileVersion');
+                Ext.Msg.show({
+                    title: currentFile.get('routePositionStatus'),
+                    message: 'Вы действительно хотите подписать?',
+                    buttons: Ext.Msg.YESNO,
+                    icon: Ext.Msg.QUESTION,
+                    scope: this,
+                    fn: function(btn) {
+                        if(btn === 'yes') {
+                            Ext.Msg.wait('Подпись', 'Получение данных...');
+                            Ext.Ajax.request({
+                                url: currentFile.getProxy().getUrl() + urlSuffix + currentFile.getId(),
+                                method: 'GET',
+                               // params: {id: currentFile.getId()},
+                                scope: this,
+                                callback: function(options, success, response) {
+                                    Ext.Msg.hide();
+                                    var responseText = Ext.decode(response.responseText);
+                                    if(success){
+                                        var data = responseText.item;
+                                        if (!this.getViewModel().get('urlSuffix')) {
+                                            this.getViewModel().set('urlSuffix', urlSuffix);
+                                        }
+                                        f_checkAndSign(3000, 'certserial:' + data.serial, Ext.encode(data.signData), this.onSaveEcp.bind(this));
+                                    } else {
+                                        Ext.Msg.show({
+                                            title: 'Ошибка',
+                                            msg: responseText ? responseText.message : response.statusText,
+                                            buttons: Ext.Msg.OK,
+                                            icon: Ext.Msg.ERROR,
+                                            scope: this,
+                                            fn: function(btn) {
+                                                if(btn === 'ok') {
+                                                    this.fireEvent('clickFileHistoryBtn', this.getView(),
+                                                    this.getViewModel().get('prevFileVersion'), this.getViewModel().get('prevFileVersion').get('id'));
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
     },
 
     onSavePaperShLBtnClick: function(button, e, eOpts) {
@@ -233,6 +276,10 @@ Ext.define('ASTD.view.file.FileHistoryFormViewController', {
         this.fireEvent('viewEcpPersonsBtnClick', this.getView(), this.getViewModel().get('prevFileVersion'));
     },
 
+    onViewEcpReviewPersonsBtnClick: function(button, e, eOpts) {
+        this.fireEvent('viewEcpReviewPersonsBtnClick', this.getViewModel().get('prevFileVersion'));
+    },
+
     onBackToFilesBtnClick: function(button, e, eOpts) {
         var fileHistoryForm = this.getView();
         this.fireEvent('clickDocList', fileHistoryForm, this.getViewModel().get('current.doc'));
@@ -268,58 +315,26 @@ Ext.define('ASTD.view.file.FileHistoryFormViewController', {
     },
 
     onViewBtnClick: function(button, e, eOpts) {
-        this.fireEvent('viewFileBtnClick', this.getViewModel().get('prevFileVersion'),  this.getView(), true);
+        this.fireEvent('viewFileBtnClick', this.getViewModel().get('prevFileVersion'),  this.getView());
     },
 
     onDownloadBtnClick: function(button, e, eOpts) {
-        this.fireEvent('downloadFileBtnClick', this.getViewModel().get('prevFileVersion'),  this.getView(), false);
+        if(Ext.fly('downloadIframe')){
+            Ext.fly('downloadIframe').destroy();
+        }
+        this.fireEvent('downloadFileBtnClick', this.getViewModel().get('prevFileVersion'),  this.getView());
     },
 
     onSignBtnClick: function(button, e, eOpts) {
-        var currentFile = this.getViewModel().get('prevFileVersion');
+        this.signFile('/ecp/');
+    },
 
-        Ext.Msg.show({
-            title: currentFile.get('routePositionStatus'),
-            message: 'Вы действительно хотите подписать?',
-            buttons: Ext.Msg.YESNO,
-            icon: Ext.Msg.QUESTION,
-            scope: this,
-            fn: function(btn) {
-                if(btn === 'yes') {
-                    Ext.Msg.wait('Подпись', 'Получение данных...');
-                    Ext.Ajax.request({
-                        url: currentFile.getProxy().getUrl() + '/ecp',
-                        method: 'GET',
-                        params: {id: currentFile.getId()},
-                        scope: this,
-                        callback: function(options, success, response) {
-                            Ext.Msg.hide();
-                            var responseText = Ext.decode(response.responseText);
-                            if(success){
-                                var data = responseText.item;
-                                f_checkAndSign(3000, 'certserial:' + data.serial, Ext.encode(data.signData), this.onSaveEcp.bind(this));
-                            } else {
-                                Ext.Msg.show({
-                                    title: 'Ошибка',
-                                    msg: responseText ? responseText.message : response.statusText,
-                                    buttons: Ext.Msg.OK,
-                                    icon: Ext.Msg.ERROR,
-                                    scope: this,
-                                    fn: function(btn) {
-                                        if(btn === 'ok') {
-                                            // Ext.Msg.wait("Загрузка", "Загрузка формы");
-                                            this.fireEvent('clickFileHistoryBtn', this.getView(),
-                                            this.getViewModel().get('prevFileVersion'), this.getViewModel().get('prevFileVersion').get('id'));
-                                            // this.getView().getStore().reload();
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    });
-                }
-            }
-        });
+    onSignReviewBtnClick: function(button, e, eOpts) {
+        this.signFile('/ecp/review/');
+    },
+
+    onCompareBtnClick: function(button, e, eOpts) {
+        this.fireEvent('compareFileBtnClick', this.getViewModel().get('prevFileVersion'),  this.getView());
     },
 
     onRejectBtnClick: function(button, e, eOpts) {

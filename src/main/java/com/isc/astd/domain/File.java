@@ -2,6 +2,7 @@ package com.isc.astd.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isc.astd.domain.converter.BranchTypeConverter;
+import com.isc.astd.domain.converter.FileReviewStatusConverter;
 import com.isc.astd.domain.converter.FileStatusConverter;
 import org.hibernate.annotations.BatchSize;
 
@@ -101,6 +102,15 @@ public class File extends AbstractBaseEntity {
     )
     private Set<FilePosition> filePositions = new HashSet<>();
 
+    @JsonIgnore
+    @BatchSize(size = 50)
+    @OneToMany(
+            mappedBy = "file",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<FileReview> fileReviews = new HashSet<>();
+
     @NotNull
     @Convert(converter = FileStatusConverter.class)
     @Column(name = "status", nullable = false)
@@ -109,6 +119,11 @@ public class File extends AbstractBaseEntity {
     @Convert(converter = FileStatusConverter.class)
     @Column(name = "status_prev")
     private Status statusPrev;
+
+    @NotNull
+    @Convert(converter = FileReviewStatusConverter.class)
+    @Column(name = "status_review", nullable = false)
+    private StatusReview statusReview = StatusReview.NO;
 
     @Size(max = 32)
     @Column(name = "status_modified_by", length = 32)
@@ -336,6 +351,22 @@ public class File extends AbstractBaseEntity {
         this.statusPrev = statusPrev;
     }
 
+    public Set<FileReview> getFileReviews() {
+        return fileReviews;
+    }
+
+    public void setFileReviews(Set<FileReview> fileReviews) {
+        this.fileReviews = fileReviews;
+    }
+
+    public StatusReview getStatusReview() {
+        return statusReview;
+    }
+
+    public void setStatusReview(StatusReview statusReview) {
+        this.statusReview = statusReview;
+    }
+
    /* public void removeFilePosition(FilePosition filePosition) {
         filePositions.remove(filePosition);
 //        filePosition.getId().setFile(null);
@@ -354,6 +385,28 @@ public class File extends AbstractBaseEntity {
         private final String text;
 
         Status(String code, String text) {
+            this.code = code;
+            this.text = text;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getText() {
+            return text;
+        }
+    }
+
+    public enum StatusReview {
+        NO("no", "Нет сверки"),
+        SIGNED("signed", "Сверен"),
+        INVALID("invalid", "Недействительный");
+
+        private final String code;
+        private final String text;
+
+        StatusReview(String code, String text) {
             this.code = code;
             this.text = text;
         }

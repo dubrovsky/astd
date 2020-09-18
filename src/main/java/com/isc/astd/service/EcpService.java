@@ -5,6 +5,7 @@ import com.isc.astd.config.ApplicationProperties;
 import com.isc.astd.domain.*;
 import com.isc.astd.repository.FilePositionRepository;
 import com.isc.astd.repository.FileRepository;
+import com.isc.astd.repository.FileReviewRepository;
 import com.isc.astd.service.dto.HashDTO;
 import com.isc.astd.service.util.AvDirPKIXBuilderParameters;
 import com.isc.astd.service.util.EcpUtils;
@@ -38,15 +39,18 @@ public class EcpService {
 
     private final FilePositionRepository filePositionRepository;
 
+    private final FileReviewRepository fileReviewRepository;
+
     private final FileRepository fileRepository;
 
     private final PKIXBuilderParameters pkixBuilderParameters;
 
-    public EcpService(ApplicationProperties properties, FileSystemService fileSystemService, FilePositionRepository filePositionRepository, FileRepository fileRepository) throws Exception {
+    public EcpService(ApplicationProperties properties, FileSystemService fileSystemService, FilePositionRepository filePositionRepository, FileReviewRepository fileReviewRepository, FileRepository fileRepository) throws Exception {
         this.properties = properties;
         pkixBuilderParameters = new AvDirPKIXBuilderParameters(Paths.get(properties.getStoragePath()).toString()).get();
         this.fileSystemService = fileSystemService;
         this.filePositionRepository = filePositionRepository;
+        this.fileReviewRepository = fileReviewRepository;
         this.fileRepository = fileRepository;
     }
 
@@ -138,5 +142,35 @@ public class EcpService {
             fileRepository.save(file);
         }
         return result;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public boolean fileReviewCheckLastEcpAndUpdate(byte[] hash, long fileId) throws Exception {
+        boolean result = true;
+        final File file = fileRepository.getOne(fileId);  // to make Propagation.REQUIRES_NEW work
+        final FileReview fileReview =
+                file.getFileReviews().stream()
+//                        .filter(fileReview_ -> fileReview_.getEcp() != null)
+                        .max(Comparator.comparing(AbstractAuditingEntity::getCreatedDate))
+                        .orElse(null);
+
+        if (fileReview != null) {
+            if (!isEcpValid(fileReview.getEcp(), hash)) { // invalid ecp
+                if (!fileReview.isInvalid()) {
+                    fileReview.setInvalid(true);
+                    fileReviewRepository.save(fileReview);
+                    file.setStatusReview(File.StatusReview.INVALID);
+                    fileRepository.save(file);
+                }
+                result = false;
+            } else if (fileReview.isInvalid()) {
+                fileReview.setInvalid(false);
+                fileReviewRepository.save(fileReview);
+                file.setStatusReview(File.StatusReview.SIGNED);
+                fileRepository.save(file);
+            }
+        }
+        return result;
+
     }
 }

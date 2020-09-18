@@ -107,6 +107,7 @@ public class Audit {
         FILE_DELETE("file_delete", "удалить файл"),
         FILE_NEW_VERSION("file_new_version", "новая версия файла"),
         FILE_SAVE_ECP("file_save_ecp", "подписать файл"),
+        FILE_SAVE_REVIEW_ECP("file_save_review_ecp", "сверить и подписать файл"),
         FILE_REJECT("file_reject", "отклонить файл"),
         FILE_REJECT_CANCEL("file_reject_cancel", "отменить отклонение файла"),
         FILE_ARCHIVE("file_archive", "архивировать файл"),

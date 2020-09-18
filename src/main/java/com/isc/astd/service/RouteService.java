@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,8 +32,14 @@ public class RouteService {
 
     @Transactional(readOnly = true)
     public List<RouteDTO> getAllRoutes(User user) {
-
         return mapper.mapAsList(routeRepository.findAllByPositionAndExpiredDateIsNull(userService.getUser(user.getUsername()).getPosition()), RouteDTO.class);
+    }
+
+    @Transactional(readOnly = true)
+    public List<RouteDTO> getAllRoutesForChange(User user, long fileRouteId) {
+	    List<Long> routeIds = Arrays.asList(1L, 5L);
+        routeIds.remove(fileRouteId);
+        return mapper.mapAsList(routeRepository.findAllByIdIn(routeIds), RouteDTO.class);
     }
 
     public Route getRoute(long id) {

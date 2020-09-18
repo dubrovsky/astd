@@ -52,6 +52,7 @@ Ext.define('ASTD.view.file.FileFormView', {
                 {
                     xtype: 'filefield',
                     anchor: '100%',
+                    reference: 'fileField',
                     fieldLabel: 'Лист',
                     name: 'file',
                     allowBlank: false,
@@ -121,6 +122,13 @@ Ext.define('ASTD.view.file.FileFormView', {
                     name: 'status',
                     bind: {
                         value: '{currentFile.status}'
+                    }
+                },
+                {
+                    xtype: 'hiddenfield',
+                    name: 'statusReview',
+                    bind: {
+                        value: '{currentFile.statusReview}'
                     }
                 },
                 {

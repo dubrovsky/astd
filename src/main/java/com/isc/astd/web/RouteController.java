@@ -1,8 +1,9 @@
 package com.isc.astd.web;
 
-import com.isc.astd.service.dto.RouteDTO;
 import com.isc.astd.service.RouteService;
+import com.isc.astd.service.dto.RouteDTO;
 import com.isc.astd.web.commons.Response;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -28,6 +29,12 @@ public class RouteController {
     @GetMapping()
     public ResponseEntity<Response<RouteDTO>> getAllRoutes(@AuthenticationPrincipal User user){
         List<RouteDTO> routeDTOS = routeService.getAllRoutes(user);
+        return ResponseEntity.ok(new Response<>(routeDTOS));
+    }
+
+    @GetMapping(params = "routeId")
+    public ResponseEntity<Response<RouteDTO>> getAllRoutesForChange(@AuthenticationPrincipal User user, @Param("routeId") Long routeId){
+        List<RouteDTO> routeDTOS = routeService.getAllRoutesForChange(user, routeId);
         return ResponseEntity.ok(new Response<>(routeDTOS));
     }
 }

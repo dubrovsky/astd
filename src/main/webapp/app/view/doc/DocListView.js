@@ -145,7 +145,7 @@ Ext.define('ASTD.view.doc.DocListView', {
                 {
                     xtype: 'button',
                     iconCls: 'x-fa fa-file-image',
-                    text: 'Файлы',
+                    text: 'Листы',
                     listeners: {
                         click: 'onFilesBtnClick'
                     }

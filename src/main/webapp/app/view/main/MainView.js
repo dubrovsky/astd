@@ -86,7 +86,10 @@ Ext.define('ASTD.view.main.MainView', {
                             xtype: 'component',
                             id: 'app-header-user',
                             bind: {
-                                html: '<h3><label>{current.user.positionName}</label> {current.user.name}</h3>'
+                                html: '<h3><label>{current.user.positionName}</label> <span style="cursor: pointer" onclick="Ext.ComponentQuery.query(\'#app-header-user\')[0].fireEvent(\'click\')">{current.user.name}</span></h3>'
+                            },
+                            listeners: {
+                                click: 'onHeaderUserClick'
                             }
                         },
                         {

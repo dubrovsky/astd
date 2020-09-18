@@ -124,8 +124,12 @@ Ext.define('ASTD.view.file.FileHistoryFormViewModel', {
             if(!file || !user) {
                 return true;
             }
-            return (file.get('branchType') === 'DEFAULT' && user.get('positionId') !== 5) ||
-            file.get('branchType') !== 'DEFAULT';
+            var isHidden = file.get('branchType') !== 'DEFAULT' && file.get('branchType') !== 'APPROVED';
+            if(!isHidden) {
+                isHidden = user.get('positionId') !== 5;
+            }
+
+            return isHidden;
         },
         isNoteHidden: function(get) {
             var user = this.get('current.user');
@@ -133,6 +137,19 @@ Ext.define('ASTD.view.file.FileHistoryFormViewModel', {
                 return true;
             }
             return user.get('positionId') !== 5;
+        },
+        isSignReviewBtnHidden: function(get) {
+            var file = get('prevFileVersion');
+            var user = this.get('current.user');
+            if(!file || !user) {
+                return true;
+            }
+            var isHidden = file.get('branchType') !== 'APPROVED' || !file.get('routeReview');
+            if(!isHidden) {
+                isHidden = user.get('positionId') !== 5;
+            }
+
+            return isHidden;
         },
         isPrevVersionBtnHidden: {
             get: function(data) {
@@ -167,7 +184,7 @@ Ext.define('ASTD.view.file.FileHistoryFormViewModel', {
         isSignBtnHidden: {
             get: function(data) {
                 var file = data;
-                isHidden = !file.get('myOrderToSign') ||
+                var isHidden = !file.get('myOrderToSign') ||
                 file.get('status') === 'APPROVED' || file.get('status') === 'REFERENCE' || file.get('status') === 'DAMAGED' || file.get('status') === 'INVALID' ||
                 file.get('status') === 'REJECTED';
 
@@ -182,7 +199,7 @@ Ext.define('ASTD.view.file.FileHistoryFormViewModel', {
         isSignBtnDisabled: {
             get: function(data) {
                 var file = data;
-                isHidden = !file.get('myOrderToSignAfterUpdate') ||
+                var isHidden = !file.get('myOrderToSignAfterUpdate') ||
                 file.get('status') === 'APPROVED' || file.get('status') === 'REFERENCE' || file.get('status') === 'DAMAGED' || file.get('status') === 'INVALID' ||
                 file.get('status') === 'REJECTED';
 
@@ -237,6 +254,44 @@ Ext.define('ASTD.view.file.FileHistoryFormViewModel', {
                 var file = data;
                 var user = this.get('current.user');
                 return file.get('status') !== 'REJECTED' || file.get('hasNextVersion') || file.get('statusModifiedBy') !== user.getId();
+            },
+            bind: {
+                bindTo: '{prevFileVersion}',
+                deep: true
+            }
+        },
+        isCompareBtnHidden: {
+            get: function(data) {
+                var file = data;
+                var user = this.get('current.user');
+                if(!file || !user) {
+                    return true;
+                }
+
+
+                return !file.get('canBeCompared');
+            },
+            bind: {
+                bindTo: '{prevFileVersion}',
+                deep: true
+            }
+        },
+        isSignsReviewBtnHidden: {
+            get: function(data) {
+                var file = this.get('prevFileVersion');
+                var user = this.get('current.user');
+                if(!file || !user) {
+                    return true;
+                }
+                var isHidden = file.get('branchType') !== 'APPROVED';
+                /*if(!isHidden) {
+                isHidden = user.get('positionId') !== 5;
+                } */
+                if(!isHidden) {
+                    isHidden = file.get('statusReview') === 'NO';
+                }
+
+                return isHidden;
             },
             bind: {
                 bindTo: '{prevFileVersion}',

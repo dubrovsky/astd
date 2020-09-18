@@ -26,8 +26,10 @@ Ext.define('ASTD.view.user.UserFormViewController', {
             bodyPadding: 10
         });
 
-        Ext.Msg.wait("Загрузка", "Загрузка списка");
-        this.getViewModel().get('userList').getStore().reload();
+        if(this.getViewModel().get('userList')) {
+            Ext.Msg.wait("Загрузка", "Загрузка списка");
+            this.getViewModel().get('userList').getStore().reload();
+        }
         this.getView().close();
     },
 

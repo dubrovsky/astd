@@ -18,6 +18,7 @@ public class ApplicationProperties {
     private String storagePath;
     private List<String> ecpProviders;
     private String ecpAlgorithm;
+    private final ImageMagick imageMagick = new ImageMagick();
 
     public String getBasePath() {
         return basePath;
@@ -49,5 +50,56 @@ public class ApplicationProperties {
 
     public void setStoragePath(String storagePath) {
         this.storagePath = storagePath;
+    }
+
+    public ImageMagick getImageMagick() {
+        return imageMagick;
+    }
+
+    public static class ImageMagick {
+        private String osPath;
+        private final Convert convert = new Convert();
+
+        public Convert getConvert() {
+            return convert;
+        }
+
+        public String getOsPath() {
+            return osPath;
+        }
+
+        public void setOsPath(String osPath) {
+            this.osPath = osPath;
+        }
+
+        public static class Convert {
+            private String density;
+            private String delay;
+            private String loop;
+
+            public String getDensity() {
+                return density;
+            }
+
+            public void setDensity(String density) {
+                this.density = density;
+            }
+
+            public String getDelay() {
+                return delay;
+            }
+
+            public void setDelay(String delay) {
+                this.delay = delay;
+            }
+
+            public String getLoop() {
+                return loop;
+            }
+
+            public void setLoop(String loop) {
+                this.loop = loop;
+            }
+        }
     }
 }

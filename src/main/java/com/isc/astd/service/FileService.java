@@ -6,10 +6,22 @@ import com.isc.astd.domain.Doc;
 import com.isc.astd.domain.File;
 import com.isc.astd.domain.FilePosition;
 import com.isc.astd.domain.FilePositionId;
+import com.isc.astd.domain.FileReview;
 import com.isc.astd.domain.Position;
 import com.isc.astd.repository.FilePositionRepository;
 import com.isc.astd.repository.FileRepository;
-import com.isc.astd.service.dto.*;
+import com.isc.astd.repository.FileReviewRepository;
+import com.isc.astd.service.dto.DomainPageParamsDTO;
+import com.isc.astd.service.dto.EcpDTO;
+import com.isc.astd.service.dto.EcpHashDTO;
+import com.isc.astd.service.dto.EcpReviewPersonDTO;
+import com.isc.astd.service.dto.FileBaseDTO;
+import com.isc.astd.service.dto.FileDTO;
+import com.isc.astd.service.dto.FileSearchDTO;
+import com.isc.astd.service.dto.FileViewDTO;
+import com.isc.astd.service.dto.PageRequestDTO;
+import com.isc.astd.service.dto.RejectFileDTO;
+import com.isc.astd.service.dto.SignedPositionDTO;
 import com.isc.astd.service.mapper.Mapper;
 import com.isc.astd.service.util.DomainUtils;
 import com.isc.astd.web.errors.EcpException;
@@ -24,9 +36,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +49,9 @@ import java.util.Optional;
 @Service
 @Transactional(rollbackFor = Throwable.class)
 public class FileService {
+
+    private static final String MIME_GIF = "image/gif";
+    private static final String MIME_PDF = "application/pdf";
 
     private final FileRepository fileRepository;
 
@@ -60,7 +75,11 @@ public class FileService {
 
     private final DomainUtils utils;
 
-    public FileService(FileRepository fileRepository, Mapper mapper, FileSystemService fileSystemService, @Lazy DocService docService, EcpService ecpService, RouteService routeService, FilePositionRepository filePositionRepository, UserService userService, FileEcpService fileEcpService, ObjectMapper objectMapper, DomainUtils utils) {
+    private final FileReviewRepository fileReviewRepository;
+
+    private final ImageMagickService imageMagickService;
+
+    public FileService(FileRepository fileRepository, Mapper mapper, FileSystemService fileSystemService, @Lazy DocService docService, EcpService ecpService, RouteService routeService, FilePositionRepository filePositionRepository, UserService userService, FileEcpService fileEcpService, ObjectMapper objectMapper, DomainUtils utils, FileReviewRepository fileReviewRepository, ImageMagickService imageMagickService) {
         this.fileRepository = fileRepository;
         this.mapper = mapper;
         this.fileSystemService = fileSystemService;
@@ -72,6 +91,8 @@ public class FileService {
         this.fileEcpService = fileEcpService;
         this.objectMapper = objectMapper;
         this.utils = utils;
+        this.fileReviewRepository = fileReviewRepository;
+        this.imageMagickService = imageMagickService;
     }
 
     @Transactional(readOnly = true)
@@ -123,7 +144,32 @@ public class FileService {
         if (fileDTO.isHasNextVersion()) {
             fileDTO.setNextVersionId(file.getParentFile().getId());
         }
+        if (file.getBranchType() == File.BranchType.APPROVED && file.getStatusReview() != File.StatusReview.NO) {
+            fileDTO.setSignedReview(file.getFileReviews().size());
+        }
+
+        if (file.getContentType().equals(MIME_PDF)) {
+           File prevFile = getPrevApprovedFileVersion(file);
+           if (prevFile != null && prevFile.getContentType().equals(MIME_PDF)) {
+               fileDTO.setCanBeCompared(true);
+           }
+        }
         return fileDTO;
+    }
+
+    private File getPrevApprovedFileVersion(File file) {
+        File prevFileVersion = file.getChildFile();
+        while (prevFileVersion != null) {
+            if (
+                    prevFileVersion.getBranchType() == File.BranchType.APPROVED &&
+                            (prevFileVersion.getStatus() == File.Status.APPROVED || prevFileVersion.getStatus() == File.Status.REFERENCE)
+            ) {
+                break;
+            }
+
+            prevFileVersion = prevFileVersion.getChildFile();
+        }
+        return prevFileVersion;
     }
 
     public FileDTO newVersionFile(FileDTO dto, User user) throws Exception {
@@ -271,6 +317,15 @@ public class FileService {
         return fileViewDTO;
     }
 
+    @Transactional(readOnly = true)
+    public FileViewDTO compareFile(long fileId) throws IOException, InterruptedException {
+        File file1 = getFile(fileId);
+        Path filePath1 = fileSystemService.getFilePath(file1.getName(), file1.getId(), file1.getDoc());
+        File file2 = getFile(file1.getChildFile().getId());
+        Path filePath2 = fileSystemService.getFilePath(file2.getName(), file2.getId(), file2.getDoc());
+        return imageMagickService.compareFiles(filePath1, filePath2);
+    }
+
     public void archiveFile(long fileId) {
         File file = getFile(fileId);
 
@@ -359,23 +414,44 @@ public class FileService {
     }
 
     @Transactional(rollbackFor = EcpException.class)
-    public void saveEcp(long fileId, User user, EcpDTO ecpDTO) throws Exception {
-        byte[] ecp = ecpService.decodeEcp(ecpDTO.getEcp());
-        byte[] realHash = objectMapper.writeValueAsBytes(ecpService.getRealHash(fileId));
-        if (!ecpService.isEcpValid(ecp, realHash)) {
+    public EcpHashDTO getEcpReviewData(long fileId, String userName) throws Exception {
+        if (!checkLastFileReviewEcpAndUpdate(fileId)) {
             throw new EcpException("Подпись не верна");
         }
+        return new EcpHashDTO(userName, ecpService.getRealHash(fileId));
+    }
 
-        Position position = userService.getUser(user.getUsername()).getPosition();
-        File file = getFile(fileId);
+    @Transactional(rollbackFor = EcpException.class)
+    public void saveEcpReview(long fileId, User user, EcpDTO ecpDTO) throws Exception {
+        EcpData ecpData = new EcpData(fileId, user, ecpDTO).invoke();
+        byte[] ecp = ecpData.getEcp();
+        Position position = ecpData.getPosition();
+        File file = ecpData.getFile();
+
+        FileReview fileReview = new FileReview(file, position, ecp);
+        fileReviewRepository.save(fileReview);
+        file.setAuditAction(Audit.Action.FILE_SAVE_REVIEW_ECP);
+        fileRepository.save(file);
+        if (file.getStatusReview() != File.StatusReview.SIGNED) {
+            file.setStatusReview(File.StatusReview.SIGNED);
+            fileRepository.save(file);
+        }
+    }
+
+    @Transactional(rollbackFor = EcpException.class)
+    public void saveEcp(long fileId, User user, EcpDTO ecpDTO) throws Exception {
+        EcpData ecpData = new EcpData(fileId, user, ecpDTO).invoke();
+        byte[] ecp = ecpData.getEcp();
+        Position position = ecpData.getPosition();
+        File file = ecpData.getFile();
+
         SignedPositionDTO nextSignPosition = fileEcpService.getNextSignPosition(file);
-        List<File> prevFilesVersion = Collections.emptyList();
         if (nextSignPosition != null && nextSignPosition.getPosition().equals(position)) {
             FilePosition filePosition = new FilePosition(new FilePositionId(file, nextSignPosition.getPosition(), nextSignPosition.getOrder()), ecp);
             file.getFilePositions().add(filePosition);
 
             if ((fileEcpService.getSignedNum(file)) == fileEcpService.getTotalSignsNum(file)) {
-                if (!checkAllFileEcpsAndUpdate(fileId, user.getUsername(), realHash)) {
+                if (!checkAllFileEcpsAndUpdate(fileId, user.getUsername(), ecpData.getRealHash())) {
                     throw new EcpException("Подпись не верна");
                 }
                 file.setBranchType(File.BranchType.APPROVED);
@@ -383,7 +459,6 @@ public class FileService {
                 file.setStatusModifiedBy(userService.getUser(user.getUsername()).getId());
 
                 tryToClearDocComment(file.getDoc(), file);
-//                prevFilesVersion = updatePrevFileVersion(file);
                 updatePrevFileVersion(file);
             } else {
                 file.setStatus(File.Status.SIGNING);
@@ -396,8 +471,6 @@ public class FileService {
         file.setNextSignPosition(nextSignPosition != null ? nextSignPosition.getPosition() : null);
         file.setAuditAction(Audit.Action.FILE_SAVE_ECP);
         fileRepository.save(file);
-
-//        updatePrevSystemFilesVersion(file, prevFilesVersion);
     }
 
     private void tryToClearDocComment(Doc doc, File ignoreFile) {
@@ -474,7 +547,7 @@ public class FileService {
         return prevFiles;
     }
 
-    public FileBaseDTO getVersion(long fileId, String direction, User user) {
+    public FileBaseDTO getPrevOrNextFileVersion(long fileId, String direction, User user) {
         File file = getFile(fileId);
         switch (DIRECTION.valueOf(direction.toUpperCase())) {
             case NEXT:
@@ -588,6 +661,32 @@ public class FileService {
         return new PageRequestDTO<>(total.longValue(), docs);
     }
 
+    public List<EcpReviewPersonDTO> getEcpReviewPersons(long fileId) {
+        File file = getFile(fileId);
+        List<EcpReviewPersonDTO> ecpReviewPersons = new ArrayList<>(file.getFileReviews().size());
+        file.getFileReviews().forEach(fileReview -> {
+            ecpReviewPersons.add(
+                    new EcpReviewPersonDTO(
+                            fileId,
+                            userService.getUser(fileReview.getCreatedBy()).getName(),
+                            fileReview.getPosition().getName(),
+                            fileReview.getCreatedDate(),
+                            fileReview.isInvalid()
+                    )
+            );
+        });
+        return ecpReviewPersons;
+    }
+
+    public void changeRoute(long fileId, long routeId) {
+        File file = getFile(fileId);
+        file.setRoute(routeService.getRoute(routeId));
+        if(file.getFilePositions().size() == 4) {
+            file.setNextSignPosition(fileEcpService.getNextSignPosition(file).getPosition());
+        }
+        fileRepository.save(file);
+    }
+
     private enum DIRECTION {
         PREV, NEXT
     }
@@ -597,5 +696,54 @@ public class FileService {
             realHash = objectMapper.writeValueAsBytes(ecpService.getRealHash(fileId));
         }
         return ecpService.fileCheckAllEcpsAndUpdate(realHash, fileId, userName);
+    }
+
+    public boolean checkLastFileReviewEcpAndUpdate(long fileId) throws Exception {
+        byte[] realHash = objectMapper.writeValueAsBytes(ecpService.getRealHash(fileId));
+        return ecpService.fileReviewCheckLastEcpAndUpdate(realHash, fileId);
+    }
+
+    private class EcpData {
+        private final long fileId;
+        private final User user;
+        private final EcpDTO ecpDTO;
+        private byte[] ecp;
+        private Position position;
+        private File file;
+        private byte[] realHash;
+
+        public EcpData(long fileId, User user, EcpDTO ecpDTO) {
+            this.fileId = fileId;
+            this.user = user;
+            this.ecpDTO = ecpDTO;
+        }
+
+        public byte[] getEcp() {
+            return ecp;
+        }
+
+        public Position getPosition() {
+            return position;
+        }
+
+        public File getFile() {
+            return file;
+        }
+
+        public byte[] getRealHash() {
+            return realHash;
+        }
+
+        public EcpData invoke() throws Exception {
+            ecp = ecpService.decodeEcp(ecpDTO.getEcp());
+            realHash = objectMapper.writeValueAsBytes(ecpService.getRealHash(fileId));
+            if (!ecpService.isEcpValid(ecp, realHash)) {
+                throw new EcpException("Подпись не верна");
+            }
+
+            position = userService.getUser(user.getUsername()).getPosition();
+            file = FileService.this.getFile(fileId);
+            return this;
+        }
     }
 }

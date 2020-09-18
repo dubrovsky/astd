@@ -60,14 +60,32 @@ Ext.define('ASTD.view.user.UserListView', {
         {
             xtype: 'gridcolumn',
             flex: 1,
-            dataIndex: 'positionName',
+            dataIndex: 'organization',
             text: 'Должность'
         },
         {
             xtype: 'gridcolumn',
             flex: 1,
-            dataIndex: 'organization',
-            text: 'Организация'
+            dataIndex: 'rootCatalogName',
+            text: 'Подразделение'
+        },
+        {
+            xtype: 'gridcolumn',
+            flex: 1,
+            dataIndex: 'positionName',
+            text: 'Уровень доступа'
+        },
+        {
+            xtype: 'gridcolumn',
+            flex: 1,
+            dataIndex: 'phone',
+            text: 'Телефон'
+        },
+        {
+            xtype: 'gridcolumn',
+            flex: 1,
+            dataIndex: 'email',
+            text: 'Эл. почта'
         }
     ],
     viewConfig: {

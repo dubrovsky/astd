@@ -12,5 +12,8 @@ import java.util.List;
  */
 @Repository
 public interface RouteRepository extends JpaRepository<Route, Long> {
+
 	List<Route> findAllByPositionAndExpiredDateIsNull(Position position);
+
+	List<Route> findAllByIdIn(List<Long> ids);
 }

@@ -18,7 +18,9 @@ public class FileBaseDTO {
     private Long nextSignPositionId;
     private String routeName;
     private Long routePositionId;
+    private boolean routeReview;
     private File.Status status;
+    private File.StatusReview statusReview;
     private File.BranchType branchType;
     private String name;
     private String listNum;
@@ -32,6 +34,7 @@ public class FileBaseDTO {
     private Instant createdDate;
     private long size;
     private int signedNum = 0;
+    private int signedReview = 0;
 //    private int mySignsNum = 0;
     private int totalSignsNum = 0;
     private boolean canBeSigned = false;
@@ -40,6 +43,7 @@ public class FileBaseDTO {
     private boolean myOrderToSignAfterUpdate = false;
     private boolean originalCheckedSigned = false;
     private boolean hasPrevVersion = false;
+    private boolean canBeCompared = false;
     private Long prevVersionId;
     private boolean hasNextVersion = false;
     private Long nextVersionId;
@@ -374,6 +378,38 @@ public class FileBaseDTO {
 	public void setThemeShchtd(String themeShchtd) {
 		this.themeShchtd = themeShchtd;
 	}
+
+    public File.StatusReview getStatusReview() {
+        return statusReview;
+    }
+
+    public void setStatusReview(File.StatusReview statusReview) {
+        this.statusReview = statusReview;
+    }
+
+    public int getSignedReview() {
+        return signedReview;
+    }
+
+    public void setSignedReview(int signedReview) {
+        this.signedReview = signedReview;
+    }
+
+    public boolean isRouteReview() {
+        return routeReview;
+    }
+
+    public void setRouteReview(boolean routeReview) {
+        this.routeReview = routeReview;
+    }
+
+    public boolean isCanBeCompared() {
+        return canBeCompared;
+    }
+
+    public void setCanBeCompared(boolean canBeCompared) {
+        this.canBeCompared = canBeCompared;
+    }
 
 	/*public List<MoreSignsDTO> getMoreSigns() {
         return moreSigns;

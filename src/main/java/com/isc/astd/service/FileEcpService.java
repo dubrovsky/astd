@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @Service
 public class FileEcpService {
 
-    private final int POSITION_ID = 5;
+    public static final int POSITION_ID = 5;
     private final int ROUTE_ID = 5;
 
     private final Mapper mapper;
@@ -85,38 +85,36 @@ public class FileEcpService {
         return Math.toIntExact(file.getFilePositions().stream().filter(docPosition -> docPosition.getEcp() != null).count());
     }
 
-    List<EcpPersonDTO> getEcpPersons(File doc) {
-        final Map<Integer, List<RoutePosition>> routePositionsByGroup = doc.getRoute().getRoutePositions().stream().collect(Collectors.groupingBy(RoutePosition::getGroup));
-        final List<EcpPersonDTO> ecpPersons = routePositionsByGroup.entrySet().stream().
-                map(routePositionByGroup -> new EcpPersonDTO(
-                        doc.getId(),
-                        mapper.mapAsList(routePositionByGroup.getValue().stream().map(RoutePosition::getPosition).collect(Collectors.toList()), PositionDTO.class),
-                        routePositionByGroup.getValue().stream().map(routePosition -> routePosition.getPosition().getName()).collect(Collectors.joining(", ")),
-                        routePositionByGroup.getValue().stream().map(routePosition -> routePosition.getStatus().getText()).collect(Collectors.joining(", ")),
-                        routePositionByGroup.getValue().stream().map(routePosition -> routePosition.getId().getOrder()).findAny().get()
+    List<EcpPersonDTO> getEcpPersons(File file) {
+        final Map<Integer, List<RoutePosition>> routePositionsByGroup = file.getRoute().getRoutePositions().stream().collect(Collectors.groupingBy(RoutePosition::getGroup));
+        final List<EcpPersonDTO> ecpPersons = routePositionsByGroup.values().stream().
+                map(routePositions -> new EcpPersonDTO(
+                        file.getId(),
+                        mapper.mapAsList(routePositions.stream().map(RoutePosition::getPosition).collect(Collectors.toList()), PositionDTO.class),
+                        routePositions.stream().map(routePosition -> routePosition.getPosition().getName()).collect(Collectors.joining(", ")),
+                        routePositions.stream().map(routePosition -> routePosition.getStatus().getText()).collect(Collectors.joining(", ")),
+                        routePositions.stream().map(routePosition -> routePosition.getId().getOrder()).findAny().get()
                 )).
                 sorted(Comparator.comparingInt(EcpPersonDTO::getRoutePositionOrder)).collect(Collectors.toList());
 
-        doc.getFilePositions().stream().
-//                filter(filePosition -> filePosition.getEcp() != null).
-        forEach(filePosition -> ecpPersons.stream().
-        filter(ecpPersonDTO ->
-                ecpPersonDTO.getPositions().stream().anyMatch(positionDTO -> positionDTO.getId() == filePosition.getId().getPosition().getId()) &&
-                        ecpPersonDTO.getRoutePositionOrder() == filePosition.getId().getOrder()
-        ).
-        findAny().
-        ifPresent(ecpPersonDTO -> {
-            ecpPersonDTO.setName(userService.getUser(filePosition.getCreatedBy()).getName());
-            ecpPersonDTO.setCreatedDate(filePosition.getCreatedDate());
-            ecpPersonDTO.setPosition(filePosition.getId().getPosition().getName());
-            if (filePosition.getMsg() != null) {
-                ecpPersonDTO.setMsg(filePosition.getMsg());
-                ecpPersonDTO.setRoutePositionStatus(File.Status.REJECTED.getText());
-            } else {
-                ecpPersonDTO.setInvalid(filePosition.isInvalid());
-            }
-        })
-);
+        file.getFilePositions().
+                forEach(filePosition -> ecpPersons.stream().filter(ecpPersonDTO ->
+                        ecpPersonDTO.getPositions().stream().anyMatch(
+                                positionDTO -> positionDTO.getId() == filePosition.getId().getPosition().getId()
+                        ) && ecpPersonDTO.getRoutePositionOrder() == filePosition.getId().getOrder()).
+                        findAny().
+                        ifPresent(ecpPersonDTO -> {
+                            ecpPersonDTO.setName(userService.getUser(filePosition.getCreatedBy()).getName());
+                            ecpPersonDTO.setCreatedDate(filePosition.getCreatedDate());
+                            ecpPersonDTO.setPosition(filePosition.getId().getPosition().getName());
+                            if (filePosition.getMsg() != null) {
+                                ecpPersonDTO.setMsg(filePosition.getMsg());
+                                ecpPersonDTO.setRoutePositionStatus(File.Status.REJECTED.getText());
+                            } else {
+                                ecpPersonDTO.setInvalid(filePosition.isInvalid());
+                            }
+                        })
+                );
 
         return ecpPersons;
     }

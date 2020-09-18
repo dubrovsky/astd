@@ -51,19 +51,40 @@ Ext.define('ASTD.view.file.FileFormViewController', {
         });
     },
 
+    saveForm: function(form) {
+        var rec = this.getViewModel().get('currentFile');
+        Ext.Msg.wait('Сохранение', 'Сохранение файла...');
+        form.submit({
+            url: rec.getProxy().getUrl(),
+            scope: this,
+            success: this.onSuccess,
+            failure: this.onFailure
+        });
+    },
+
     onSaveClick: function(button, e, eOpts) {
-        var form = this.lookupReference('fileForm'),
-            rec;
+        var form = this.lookupReference('fileForm');
 
         if (form.isValid()) {
-            rec = this.getViewModel().get('currentFile');
-            Ext.Msg.wait('Сохранение', 'Сохранение файла...');
-            form.submit({
-                url: rec.getProxy().getUrl(),
-                scope: this,
-                success: this.onSuccess,
-                failure: this.onFailure
-            });
+            var fileField = this.lookupReference('fileField');
+            var fileSize = fileField.fileInputEl.dom.files[0].size;
+            if (fileSize > (5 * 1024 * 1024)) { // 5MB
+                Ext.Msg.show({
+                    title:'Предупреждение',
+                    message: 'Загружаемый файл больше 5MB, продолжить?',
+                    buttons: Ext.Msg.YESNO,
+                    icon: Ext.Msg.QUESTION,
+                    scope: this,
+                    fn: function(btn) {
+                        if (btn === 'yes') {
+                            this.saveForm(form);
+                        }
+                    }
+                });
+            } else {
+                this.saveForm(form);
+            }
+
         }
     },
 

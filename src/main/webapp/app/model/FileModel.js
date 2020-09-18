@@ -77,6 +77,11 @@ Ext.define('ASTD.model.FileModel', {
         },
         {
             type: 'string',
+            defaultValue: 'NO',
+            name: 'statusReview'
+        },
+        {
+            type: 'string',
             allowNull: true,
             defaultValue: 'DEFAULT',
             name: 'branchType'
@@ -99,9 +104,23 @@ Ext.define('ASTD.model.FileModel', {
             name: 'signs'
         },
         {
+            type: 'int',
+            name: 'signedReview'
+        },
+        {
+            type: 'boolean',
+            defaultValue: false,
+            name: 'routeReview'
+        },
+        {
             type: 'boolean',
             defaultValue: false,
             name: 'canBeSigned'
+        },
+        {
+            type: 'boolean',
+            defaultValue: false,
+            name: 'canBeCompared'
         },
         {
             type: 'boolean',
